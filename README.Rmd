@@ -1,0 +1,18 @@
+# README
+
+This is an R package used in Stat 217 at Montana State University.  Currently, it is only available on GitHub.  
+
+## Installation
+
+You must install the `devtools` package first.
+
+```{r install-devtools, eval=FALSE}
+install.packages("devtools")
+```
+
+Then, use `install_github` to install this package.
+
+```{r install-catstats, eval=FALSE}
+devtools::install_github("kferris10/catstats")
+```
+
