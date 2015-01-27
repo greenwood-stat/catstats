@@ -84,4 +84,12 @@ something}
 This function allows you to generate interaction plots for a Two-Way ANOVA
 with error bars.
 }
+\details{
+Describe what is going on here.
+}
+\examples{
+# must have the effects package installed
+data(TitanicSurvival, package = "effects")
+intplot(age ~ sex * survived, data = TitanicSurvival)
+}
 
