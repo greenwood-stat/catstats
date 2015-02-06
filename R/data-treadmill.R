@@ -1,6 +1,6 @@
 #' Fitness Measurements Taken on a Treadmill
 #'
-#' These data come from a study on .  Used in Chapter 0 to help introduce
+#' These data come from a study on (what was this study on?).  Used in Chapter 0 to help introduce
 #' students to R and RStudio.
 #'
 #' @format a \code{data.frame} with 31 observations on 8 variables:
