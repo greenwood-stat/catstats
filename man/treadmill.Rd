@@ -20,7 +20,7 @@
 treadmill
 }
 \description{
-These data come from a study on .  Used in Chapter 0 to help introduce
+These data come from a study on (what was this study on?).  Used in Chapter 0 to help introduce
 students to R and RStudio.
 }
 \references{
