@@ -16,3 +16,7 @@ Then, use `install_github` to install this package.
 devtools::install_github("kferris10/catstats")
 ```
 
+This README is awesome!  Great job Mark.
+
+* list 1
+* list 2
