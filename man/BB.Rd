@@ -5,9 +5,9 @@
 \alias{BB}
 \title{Blood Alcohol Contents}
 \format{A data frame with 16 rows and 2 variables:
-\describe {
- \item{Beers}{Number of cans of beer consumed}
- \item{BAC}{Blood alcohol content, in grams per decaliter}
+\describe{
+ \item{Beers}{number of cans of beer consumed}
+ \item{BAC}{blood alcohol content, in grams per decaliter}
 }}
 \source{
 In progress
