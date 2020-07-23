@@ -9,3 +9,4 @@ LazyData: true
 Suggests:
   effects (>= 3.0-3),
   mosaic (>= 0.9.2-2)
+RoxygenNote: 7.1.1
