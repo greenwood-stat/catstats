@@ -43,18 +43,34 @@ intplot(
 coerced to that class); a symbolic description of the model to be plotted.
 The details of the model specification are given under "Details".}
 
-\item{data}{an optional data frame containing the variables in the model.  If
-not found in \code{data}, the variables are taken from the global
-environment (I'm assuming).}
+\item{data}{a required data frame containing the variables for the plot.}
 
 \item{type}{character.  One of "l", "p", "b".  Defaults to "b".  Does
 something}
 
 \item{x.cont}{boolean.  Defaults to FALSE.}
 
-\item{legend}{boolean.  Defaults to TRUE.}
+\item{legend}{boolean.  Defaults to TRUE. Adds legend to plot.}
+
+\item{cex.leg}{Defaults to 1. Size of text in legend.}
+
+\item{pch}{Symbols for means in plot.}
+
+\item{ci.fun}{Function for finding the width of error bars, with default of plus/minus 1 SE.}
+
+\item{col}{Defaults to 1:10 for the colors used in the plot.}
+
+\item{main}{Title for plot.}
+
+\item{cld}{boolean.  Defaults to FALSE. If true, adds compact letter display from Tukey's HSD that is run.}
+
+\item{cldshift}{Defaults to 0.1. Amount to shift letters added to plot.}
+
+\item{cldcol}{Colors for letters.}
 
 \item{...}{optional arguments to be passed to plot.}
+
+\item{bw}{Defaults to "SJ-dpi". Option to pass into pirateplots for making the density curves and can be manually specified if there is no variation in a group to get something to display.}
 }
 \description{
 This function allows you to generate interaction plots for a Two-Way ANOVA
