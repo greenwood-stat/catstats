@@ -7,16 +7,16 @@
 \format{
 A data frame with 23 rows and 3 columns:
 \describe{
- \item{Year}{year of data}
- \item{Temperature}{average daily high temperature, in degrees Fahrenheit}
- \item{Hectares}{total area burned by wildfires.  One hectare is equal to
-   10,000 square meters.}
-  }
+\item{Year}{year of data}
+\item{Temperature}{average daily high temperature, in degrees Fahrenheit}
+\item{Hectares}{total area burned by wildfires.  One hectare is equal to
+10,000 square meters.}
+}
 }
 \source{
 Gude, P.H., Cookson, A.J., Greenwood, M.C., and Haggerty, M. (2009)
-  Homes in Wildfire-Prone Areas:An Empirical Analysis of Wildfire Suppression
-  Costs and Climate Change.
+Homes in Wildfire-Prone Areas:An Empirical Analysis of Wildfire Suppression
+Costs and Climate Change.
 }
 \usage{
 mtfires

@@ -6,12 +6,12 @@
 \title{Paper Towel Data}
 \format{
 a \code{data.frame} with 30 observations on three variables
-  \describe{
-    \item{brand}{a factor containing the brand of the paper towel
-      (either B1 or B2)}
-    \item{drops}{the number of drops of water on the paper towel.
-      This is stored as a factor.}
-    \item{responses}{the number of seconds the paper towel supports the weight}
+\describe{
+\item{brand}{a factor containing the brand of the paper towel
+(either B1 or B2)}
+\item{drops}{the number of drops of water on the paper towel.
+This is stored as a factor.}
+\item{responses}{the number of seconds the paper towel supports the weight}
 }
 }
 \usage{

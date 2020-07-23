@@ -7,8 +7,8 @@
 \format{
 A data frame with 16 rows and 2 variables:
 \describe{
- \item{Beers}{number of cans of beer consumed}
- \item{BAC}{blood alcohol content, in grams per decaliter}
+\item{Beers}{number of cans of beer consumed}
+\item{BAC}{blood alcohol content, in grams per decaliter}
 }
 }
 \source{
