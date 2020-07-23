@@ -1,22 +1,19 @@
 # README
 
-This is an R package used in Stat 217 at Montana State University.  Currently, it is only available on GitHub.  
+This is an R package used in Stat 216 and 217 at Montana State University.  Currently, it is only available on GitHub.  
 
 ## Installation
 
-You must install the `devtools` package first.
+You must install the `remotes` package first.
 
 ```{r install-devtools, eval=FALSE}
-install.packages("devtools")
+install.packages("remotes")
 ```
 
 Then, use `install_github` to install this package.
 
 ```{r install-catstats, eval=FALSE}
-devtools::install_github("kferris10/catstats")
+remotes::install_github("greenwood-stat/catstats")
 ```
 
-This README is awesome!  Great job Mark.
-
-* list 1
-* list 2
+This package contains interactive vignettes, code, and data sets to support STAT 216 and STAT 217 at Montana State University and is publicly available for others to use.
