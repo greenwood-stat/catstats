@@ -34,12 +34,11 @@
 #' @param cld boolean.  Defaults to FALSE. If true, adds compact letter display from Tukey's HSD that is run.
 #' @param cldshift Defaults to 0.1. Amount to shift letters added to plot.
 #' @param cldcol Colors for letters.
-#' @param bw Defaults to "SJ-dpi". Option to pass into pirateplots for making the density curves and can be manually specified if there is no variation in a group to get something to display.
 #' @param ... optional arguments to be passed to plot.
 #' @details Describe what is going on here.
 #' @examples
-#' # must have the effects package installed
-#' data(TitanicSurvival, package = "effects")
+#' # must have the carData package installed
+#' data(TitanicSurvival, package = "carData")
 #' intplot(age ~ sex * survived, data = TitanicSurvival)
 
 intplot<-function (formula = NULL, data = NULL, type = "b", x.cont = FALSE,

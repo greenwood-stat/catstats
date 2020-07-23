@@ -39,8 +39,8 @@
 #' @param ... optional arguments to be passed to plot.
 #' @details Describe what is going on here.
 #' @examples
-#' # must have the effects package installed
-#' data(TitanicSurvival, package = "effects")
+#' # must have the carData package installed
+#' data(TitanicSurvival, package = "carData")
 #' intplotarray(age ~ sex * survived, data = TitanicSurvival)
 
 

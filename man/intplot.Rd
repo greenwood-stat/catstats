@@ -69,8 +69,6 @@ something}
 \item{cldcol}{Colors for letters.}
 
 \item{...}{optional arguments to be passed to plot.}
-
-\item{bw}{Defaults to "SJ-dpi". Option to pass into pirateplots for making the density curves and can be manually specified if there is no variation in a group to get something to display.}
 }
 \description{
 This function allows you to generate interaction plots for a Two-Way ANOVA
@@ -80,7 +78,7 @@ with error bars.
 Describe what is going on here.
 }
 \examples{
-# must have the effects package installed
-data(TitanicSurvival, package = "effects")
+# must have the carData package installed
+data(TitanicSurvival, package = "carData")
 intplot(age ~ sex * survived, data = TitanicSurvival)
 }

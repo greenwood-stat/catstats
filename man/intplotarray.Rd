@@ -80,7 +80,7 @@ with error bars with an array of plots and main effect type plots.
 Describe what is going on here.
 }
 \examples{
-# must have the effects package installed
-data(TitanicSurvival, package = "effects")
+# must have the carData package installed
+data(TitanicSurvival, package = "carData")
 intplotarray(age ~ sex * survived, data = TitanicSurvival)
 }
