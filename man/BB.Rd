@@ -19,7 +19,6 @@ BB
 }
 \description{
 A group of n=16 student volunteers at The Ohio State University drank a
-randomly assigned number of cans of beer. Thirty minutes later, a police
-officer measured their BAC.
+number of beers and their BAC levels were measured. Full details are not known on this data set and the original source of the data is unknown.
 }
 \keyword{datasets}

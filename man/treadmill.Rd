@@ -22,7 +22,7 @@ minute}
 treadmill
 }
 \description{
-These data come from a study on (what was this study on?).  Used in Chapter 0 to help introduce
+These data come from a study on a set of subjects at a university.  Used in Intermediate Statistics with R in Chapter 1 to help introduce
 students to R and RStudio.
 }
 \references{

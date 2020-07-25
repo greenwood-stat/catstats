@@ -1,12 +1,47 @@
 Package: catstats
 Title: Statistics for Montana State University Bobcats
-Version: 0.0.1.0000
+Version: 0.1
 Authors@R: 
     person(given = "Mark",
            family = "Greenwood",
            role = c("aut", "cre"),
            email = "greenwood@montana.edu")
-Description: Contains a suite of things that are used in instruction at Montana State University. Intended to make working in RStudio easier for the students on MSU. Also supports the textbook "Intermediate Statistics with R" written by Mark Greenwood.
+Description: Contains a suite of things that are used in instruction at Montana State University. Intended to make working in RStudio easier for the students on MSU. Also supports the textbook "Intermediate Statistics with R" written by Mark Greenwood. It contains functions for enhanced interaction plots. It also will install most packages needed for the materials in the courses.
+Depends:
+    R (>= 3.6.2)
+Imports:
+    alr3,
+    car,
+    carData,
+    corrplot,
+    faraway,
+    tibble,
+    heplots,
+    smdata,
+    MuMIn,
+    coneproj,
+    ggplot2,
+    ggthemes,
+    readr,
+    yarrr,
+    effects,
+    mosaic,
+    mosaicData,
+    multcomp,
+    nlme,
+    vcd,
+    poLCA,
+    openintro,
+    survey,
+    MASS,
+    psych,
+    RColorBrewer,
+    Sleuth3,
+    spuRs,
+    tidyverse,
+    knitr,
+    viridis,
+    rmarkdown
 License: `use_mit_license()`, `use_gpl3_license()` or friends to
     pick a license
 Encoding: UTF-8

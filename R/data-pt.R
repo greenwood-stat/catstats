@@ -1,11 +1,11 @@
 #' Paper Towel Data
 #'
-#' These data come from an experiment comparing the strength of different types
+#' These are simulated data to illustrate what could have happened in an experiment comparing the strength of different types
 #' of paper towels when they are wet.  Two different brands were compared at
 #' three different levels of wetness.  Strength was interpreted as how long the
 #' damp paper towel could support a weight.  The paper towel was held at four
 #' corners and the weight was placed in the center.
-#' These data are used in Chapter 3: Two-Way ANOVA
+#' These data are used in Intermediate Statistics with R's Chapter 4: Two-Way ANOVA
 #'
 #' @format a \code{data.frame} with 30 observations on three variables
 #'   \describe{
