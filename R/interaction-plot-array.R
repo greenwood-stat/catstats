@@ -43,7 +43,7 @@
 #' data(TitanicSurvival, package = "carData")
 #' intplotarray(age ~ sex * survived, data = TitanicSurvival)
 
-
+#' @export
 intplotarray<-function (formula = NULL, data = NULL, type = "b", x.cont = FALSE,
                         legend = TRUE, trace.label = NULL, leg.lab = NULL, fixed = FALSE,
                         x.leg = NULL, y.leg = NULL, cex.leg = 1, ncol = 1, pch = c(16,
