@@ -45,20 +45,51 @@ The details of the model specification are given under "Details".}
 
 \item{data}{a required data frame containing the variables for the plot.}
 
-\item{type}{character.  One of "l", "p", "b".  Defaults to "b".  Does
-something}
+\item{type}{character.  One of "p" or "b".  Defaults to "b" for base version that adds lines between points. Choose "p" to not have lines (just points with error bars).}
 
-\item{x.cont}{boolean.  Defaults to FALSE.}
+\item{x.cont}{boolean.  Defaults to FALSE as current interaction plots are not for continuous predictors but included for future development.}
 
-\item{legend}{boolean.  Defaults to TRUE. Adds legend to plot.}
+\item{legend}{boolean.  Defaults to TRUE. Adds legend to plot, removal causes other changes.}
+
+\item{trace.label}{text. Adds a text label to the legend}
+
+\item{leg.lab}{text. Changes the names of levels used in legend, must match the number of levels.}
+
+\item{fixed}{boolean. Defaults to FALSE and relates to order of labels in legend.}
+
+\item{x.leg}{Defaults to NULL. Determines x-location of legend on plot.}
+
+\item{y.leg}{Defaults to NULL. Determines x-location of legend on plot.}
 
 \item{cex.leg}{Defaults to 1. Size of text in legend.}
 
-\item{pch}{Symbols for means in plot.}
+\item{ncol}{Defaults to 1. Number of columns for the legend. 1 is usually best.}
 
-\item{ci.fun}{Function for finding the width of error bars, with default of plus/minus 1 SE.}
+\item{pch}{Symbols for means in plot. Match number of levels as used in first variable in formula.}
+
+\item{fun}{Function for finding the point estimates, defaults to finding the mean. Change not recommended.}
+
+\item{ci.fun}{Function for finding the width of error bars, with default of plus/minus 1 SE. See function for details to change this.}
+
+\item{err.width}{Defaults to 0.1 if less than 10 levels and 0 otherwise. Can specify wider or smaller than 0.1.}
+
+\item{err.col}{Defaults to matching order of levels and other aspects of plot but can make contrasting error bars with other choices.}
+
+\item{err.lty}{Defaults to 1. Line type for the error bars. Best to leave solid but can be changed.}
+
+\item{xlim}{Defaults to NULL. Can make other choices to modify default choice that tries to make room for standard versions of interaction plots.}
+
+\item{ylim}{Defaults to NULL. Can make other choices to modify default choice that tries to make room for standard versions of interaction plots.}
+
+\item{cex}{Defaults to 1. Size of points for means in plot.}
+
+\item{lwd}{Deafults to 1. Line width for lines in plot.}
 
 \item{col}{Defaults to 1:10 for the colors used in the plot.}
+
+\item{cex.axis}{Defaults to 1. Size of text for tick marks on x and y axis.}
+
+\item{xaxt}{Defaults to "s". Change to "n" to remove x-axis tick marks.}
 
 \item{main}{Title for plot.}
 
@@ -66,7 +97,7 @@ something}
 
 \item{cldshift}{Defaults to 0.1. Amount to shift letters added to plot.}
 
-\item{cldcol}{Colors for letters.}
+\item{cldcol}{Colors for letters for CLD.}
 
 \item{...}{optional arguments to be passed to plot.}
 }
@@ -75,7 +106,7 @@ This function allows you to generate interaction plots for a Two-Way ANOVA
 with error bars.
 }
 \details{
-Describe what is going on here.
+Function for making nice looking interaction plots with 1 SE-based intervals. Add Tukey's HSD results via Compact Letter Displays.
 }
 \examples{
 # must have the carData package installed

@@ -6,36 +6,35 @@
 #'   coerced to that class); a symbolic description of the model to be plotted.
 #'   The details of the model specification are given under "Details".
 #' @param data a required data frame containing the variables for the plot.
-#' @param type character.  One of "l", "p", "b".  Defaults to "b".  Does
-#'   something
-#' @param x.cont boolean.  Defaults to FALSE.
-#' @param legend boolean.  Defaults to TRUE. Adds legend to plot.
-#' @param trace.label
-#' @param leg.lab
-#' @param fixed
-#' @param x.leg
-#' @param y.leg
+#' @param type character.  One of "p" or "b".  Defaults to "b" for base version that adds lines between points. Choose "p" to not have lines (just points with error bars).
+#' @param x.cont boolean.  Defaults to FALSE as current interaction plots are not for continuous predictors but included for future development.
+#' @param legend boolean.  Defaults to TRUE. Adds legend to plot, removal causes other changes.
+#' @param trace.label text. Adds a text label to the legend
+#' @param leg.lab text. Changes the names of levels used in legend, must match the number of levels.
+#' @param fixed boolean. Defaults to FALSE and relates to order of labels in legend.
+#' @param x.leg Defaults to NULL. Determines x-location of legend on plot.
+#' @param y.leg Defaults to NULL. Determines x-location of legend on plot.
 #' @param cex.leg Defaults to 1. Size of text in legend.
-#' @param ncol
-#' @param pch Symbols for means in plot.
-#' @param fun
-#' @param ci.fun Function for finding the width of error bars, with default of plus/minus 1 SE.
-#' @param err.width
-#' @param err.col
-#' @param err.lty
-#' @param xlim
-#' @param ylim
-#' @param cex
-#' @param lwd
+#' @param ncol Defaults to 1. Number of columns for the legend. 1 is usually best.
+#' @param pch Symbols for means in plot. Match number of levels as used in first variable in formula.
+#' @param fun Function for finding the point estimates, defaults to finding the mean. Change not recommended.
+#' @param ci.fun Function for finding the width of error bars, with default of plus/minus 1 SE. See function for details to change this.
+#' @param err.width Defaults to 0.1 if less than 10 levels and 0 otherwise. Can specify wider or smaller than 0.1.
+#' @param err.col Defaults to matching order of levels and other aspects of plot but can make contrasting error bars with other choices.
+#' @param err.lty Defaults to 1. Line type for the error bars. Best to leave solid but can be changed.
+#' @param xlim Defaults to NULL. Can make other choices to modify default choice that tries to make room for standard versions of interaction plots.
+#' @param ylim Defaults to NULL. Can make other choices to modify default choice that tries to make room for standard versions of interaction plots.
+#' @param cex Defaults to 1. Size of points for means in plot.
+#' @param lwd Deafults to 1. Line width for lines in plot.
 #' @param col Defaults to 1:10 for the colors used in the plot.
-#' @param cex.axis
-#' @param xaxt
+#' @param cex.axis Defaults to 1. Size of text for tick marks on x and y axis.
+#' @param xaxt Defaults to "s". Change to "n" to remove x-axis tick marks.
 #' @param main Title for plot.
 #' @param cld boolean.  Defaults to FALSE. If true, adds compact letter display from Tukey's HSD that is run.
 #' @param cldshift Defaults to 0.1. Amount to shift letters added to plot.
-#' @param cldcol Colors for letters.
+#' @param cldcol Colors for letters for CLD.
 #' @param ... optional arguments to be passed to plot.
-#' @details Describe what is going on here.
+#' @details Function for making nice looking interaction plots with 1 SE-based intervals. Add Tukey's HSD results via Compact Letter Displays.
 #' @examples
 #' # must have the carData package installed
 #' data(TitanicSurvival, package = "carData")
