@@ -201,3 +201,76 @@ paired_observed_plot <- function(data){
          col = "white", bty = "n")
 }
 
+
+
+###############
+#Function to run simulation test for matched pairs
+#Arguments: 
+#data: two- or three-column data frame, with values for each group in last two columns
+#number_repetitions: number of draws for simulation test
+#as_extreme_as: observed statistic
+#direction: one of "greater", "less", or "two-sided" to give direction of hypothsis test
+#
+#Returns: produced plot of distribution of simulated values, with values as or more extreme
+#than specified value highlighted and count/proportion of those values reported as subtitle on plot
+###############
+
+
+
+
+paired_test <- function(data, direction = c("greater", "less", "two-sided"),
+                        as_extreme_as, number_repetitions = 3){
+  if(ncol(data) == 1 | ncol(data) > 3)
+    stop("Data should have two or three variables")
+  if(ncol(data) == 3)
+    data <- data[,2:3]
+  if(!(direction %in% c("greater", "less", "two-sided")))
+    stop("direction must be 'greater', 'less', or 'two-sided'")
+  if(is.null(as_extreme_as))
+    stop("Must enter cutoff value for 'as_extreme_as")
+  
+  n = nrow(data)
+  differences = data[,1]-data[,2]
+  obs_diff <- mean(differences)
+  sim_diffs <- rep(NA, number_repetitions)
+  for(i in 1:number_repetitions){
+    multiplier <- (-1)^rbinom(n, 1, .5)
+    sim_diffs[i] <- mean(differences*multiplier)
+  }
+  
+  count_extreme <- ifelse(direction == "greater", sum(sim_diffs >= as_extreme_as),
+                          ifelse(direction == "less", sum(sim_diffs <= as_extreme_as),
+                                 sum(sim_diffs <= -abs(as_extreme_as)) + 
+                                   sum(sim_diffs >= abs(as_extreme_as))))
+  
+  h <- hist(sim_diffs, plot = FALSE, breaks = "FD")
+  if(direction == "two-sided"){
+    cuts <- cut(h$breaks, c(-Inf, -abs(as_extreme_as), abs(as_extreme_as), Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[1]] ="red"
+    col.vec[cuts == levels(cuts)[3]] ="red"
+  }else if (direction == "greater"){
+    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[2]] ="red"
+  }else{
+    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[1]] ="red"
+  }
+  plot(h, col = col.vec, main = "", ylab = "", xlab = "Average Difference",
+       sub = paste("Count = ", 
+                   count_extreme, 
+                   "/", number_repetitions, " = ", 
+                   round(count_extreme/number_repetitions,4), sep = ""))
+  
+  legend("topright", legend = c(paste("Mean =", round(mean(sim_diffs, na.rm = T),3)),
+                                paste("SD =", round(sd(sim_diffs, na.rm = T),3))),
+         col = "white", bty = "n")
+  if(direction == "two-sided"){
+    abline(v = abs(as_extreme_as), col= "red", lwd = 2)
+    abline(v = -abs(as_extreme_as), col= "red", lwd = 2)
+  }else{
+    abline(v = as_extreme_as, col= "red", lwd = 2)
+  }
+}
