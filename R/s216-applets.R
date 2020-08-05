@@ -149,3 +149,55 @@ one_proportion_test <- function(probability_success = 0.5,
   }
   
 }
+
+
+
+
+###############
+#Function to reproduce plot of observed matched pairs data
+#Arguments: 
+#data: two- or three-column data frame, with values for each group in last two columns
+#
+#Returns: produced plot of distribution of observed values, with means & SDs in groups and 
+#paired observations linked by a line segment
+###############
+
+
+
+paired_observed_plot <- function(data){
+  if(ncol(data) < 2 | ncol(data) > 3)
+    stop("Data should have two or three variables")
+  if(ncol(data) == 3)
+    data <- data[,2:3]
+  
+  differences = data[,1]-data[,2]
+  par(mfrow = c(2,1), mgp = c(2, .5, 0), mar = c(4,4,0,0)+.1)
+  plot(0,0, "n", xlim = c(min(data), max(data)),
+       ylim = c(0,5), yaxt = "n", xlab = "Outcomes", 
+       ylab = "")
+  points(data[,1], rep(0.5, nrow(data)), pch = 15, col = "blue")
+  points(data[,2],rep(3, nrow(data)), pch = 15, col = "red")
+  for(i in 1:nrow(data)){
+    lines(c(data[i,]), c(.5, 3))
+  }
+  
+  leg.loc = min(data) + 0.85*(max(data)-min(data))
+  legend(leg.loc,5, col = "white", bty = "n",
+         legend = c(dimnames(data)[[2]][1], paste("Mean =", round(mean(data[,1],na.rm = T), 3)),
+                    paste("SD =", round(sd(data[,1], na.rm = T), 3))),
+         text.col = "red", cex = 0.75)
+  legend(leg.loc,3 , col = "white", bty = "n",
+         legend = c(dimnames(data)[[2]][2], paste("Mean =", round(mean(data[,2],na.rm = T), 3)),
+                    paste("SD =", round(sd(data[,2], na.rm = T), 3))),
+         text.col = "blue", cex = 0.75)
+  
+  
+  
+  hist(differences, xlab = "Differences",
+       ylab = "", col = "grey80",
+       main = "", breaks = round(nrow(data)/3))
+  legend("topright", legend = c(paste("Mean =", round(mean(differences, na.rm = T),3)),
+                                paste("SD =", round(sd(differences, na.rm = T),3))),
+         col = "white", bty = "n")
+}
+
