@@ -34,5 +34,5 @@ This function will run a simulation-based hypothesis test for the value of a sin
 }
 \examples{
 one_proportion_test(probability_success = 0.5, sample_size = 150, number_repetitions = 100,
-          as_extreme_as = 0.65, direction = "greater", return_value = "proportion")
+          as_extreme_as = 0.65, direction = "greater", report_value = "proportion")
 }

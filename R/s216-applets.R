@@ -163,7 +163,7 @@ one_proportion_test <- function(probability_success = 0.5,
 #' Function to produce bootstrap confidence interval for one proportion
 #'
 #' @param sample_size number of trials used to compute proportion
-#' @param number_success how many successes were observed in those trials?
+#' @param number_successes how many successes were observed in those trials?
 #' @param number_repetitions number of draws for simulation test
 #' @param confidence_level confidence level for interval in decimal form.  Defaults to 95%
 #'
@@ -197,7 +197,7 @@ one_proportion_bootstrap_CI <- function(sample_size, number_successes,
   low_ci <- quantile(sim_props, (1-confidence_level)/2)
   high_ci <- quantile(sim_props, 1-(1-confidence_level)/2)
 
-  plot(0,0, "n", xlim = c(min(min(sim_props), low_ci-(max(sim_props)-min(sim_props))/5), max(sim_props)),
+  plot(0,0, "n", xlim = c(min(min(sim_props), low_ci-(max(sim_props)-min(sim_props))/5), max(max(sim_props), high_ci + (max(sim_props)-min(sim_props))/5)),
        ylim = c(0, max(success_tab)+1),
        xlab = "Bootstrapped values of the proportion", ylab = "", yaxt = "n",
        sub = paste0(100*confidence_level, "% CI: (",
@@ -227,7 +227,7 @@ one_proportion_bootstrap_CI <- function(sample_size, number_successes,
 #' @examples
 #' set.seed(117)
 #' x <- rnorm(25)
-#' y <- x + 1 + rnorm(25, 0, .3)
+#' y <- x + 1 + rnorm(25, 0, 1.8)
 #' data <- data.frame(x,y)
 #' paired_observed_plot(data)
 #' @export
@@ -244,7 +244,7 @@ paired_observed_plot <- function(data){
   differences = data[,1]-data[,2]
   par(mfrow = c(2,1), mgp = c(2, .5, 0), mar = c(4,4,0,0)+.1)
   plot(0,0, "n", xlim = c(min(data), max(data)),
-       ylim = c(0,5), yaxt = "n", xlab = "Outcomes",
+       ylim = c(0,5.5), yaxt = "n", xlab = "Outcomes",
        ylab = "")
   points(data[,1], rep(0.5, nrow(data)), pch = 15, col = "blue")
   points(data[,2],rep(3, nrow(data)), pch = 15, col = "red")
@@ -253,18 +253,18 @@ paired_observed_plot <- function(data){
   }
 
   leg.loc = min(data) + 0.85*(max(data)-min(data))
-  legend(leg.loc,5, col = "white", bty = "n",
+  legend(leg.loc,5.5, col = "white", bty = "n",
          legend = c(dimnames(data)[[2]][1], paste("Mean =", round(mean(data[,1],na.rm = T), 3)),
                     paste("SD =", round(sd(data[,1], na.rm = T), 3))),
          text.col = "red", cex = 0.75)
-  legend(leg.loc,3 , col = "white", bty = "n",
+  legend(leg.loc,2.5 , col = "white", bty = "n",
          legend = c(dimnames(data)[[2]][2], paste("Mean =", round(mean(data[,2],na.rm = T), 3)),
                     paste("SD =", round(sd(data[,2], na.rm = T), 3))),
          text.col = "blue", cex = 0.75)
 
 
 
-  hist(differences, xlab = "Differences",
+  hist(differences, xlab = "Observed differences",
        ylab = "", col = "grey80",
        main = "", breaks = round(nrow(data)/3))
   legend("topright", legend = c(paste("Mean =", round(mean(differences, na.rm = T),3)),
@@ -287,7 +287,7 @@ paired_observed_plot <- function(data){
 #' @examples
 #' set.seed(117)
 #' x <- rnorm(25)
-#' y <- x + 1 + rnorm(25, 0, .3)
+#' y <- x + 1 + rnorm(25, 0, 1.8)
 #' data <- data.frame(x,y)
 #' obs_diff <- mean(x - y)
 #' paired_test(data, shift = -obs_diff, direction = "two-sided", as_extreme_as = obs_diff,
@@ -344,7 +344,12 @@ paired_test <- function(data, shift = 0, direction = c("greater", "less", "two-s
         col.vec <- rep("grey80", length(cuts))
         col.vec[cuts == levels(cuts)[1]] ="red"
     }
-    plot(h, col = col.vec, main = "", ylab = "", xlab = "Average Difference",
+
+    range_diffs <- max(sim_diffs)-min(sim_diffs)
+
+    plot(h, col = col.vec, main = "", ylab = "", xlab = "Mean Difference",
+         xlim = c(min(min(sim_diffs), ifelse(direction == "two-sided", -abs(as_extreme_as)-range_diffs/5, as_extreme_as-range_diffs/5)),
+                  max(max(sim_diffs), ifelse(direction == "two-sided", abs(as_extreme_as)+range_diffs/5, as_extreme_as+range_diffs/5))),
          yaxt = "n", sub = paste("Count = ",
                                  count_extreme,
                                  "/", number_repetitions, " = ",
@@ -374,7 +379,7 @@ paired_test <- function(data, shift = 0, direction = c("greater", "less", "two-s
 #' @examples
 #' set.seed(117)
 #' x <- rnorm(25)
-#' y <- x + 1 + rnorm(25, 0, .3)
+#' y <- x + 1 + rnorm(25, 0, 1.8)
 #' data <- data.frame(x,y)
 #' paired_bootstrap_CI(data, number_repetitions = 100, confidence_level = 0.9, which_first = 1)
 #' @export
@@ -524,7 +529,10 @@ two_proportion_test <- function(formula, data, first_in_subtraction,
     col.vec <- rep("grey80", length(cuts))
     col.vec[cuts == levels(cuts)[1]] ="red"
   }
+  range_diffs <- max(sim_diffs)-min(sim_diffs)
   plot(h, col = col.vec, main = "", ylab = "", xlab = "Difference in proportions",
+       xlim = c(min(min(sim_diffs), ifelse(direction == "two-sided", -abs(as_extreme_as)-range_diffs/5, as_extreme_as-range_diffs/5)),
+                max(max(sim_diffs), ifelse(direction == "two-sided", abs(as_extreme_as)+range_diffs/5, as_extreme_as+range_diffs/5))),
        sub = paste("Count = ",
                    count_extreme,
                    "/", number_repetitions, " = ",
@@ -683,7 +691,8 @@ two_mean_test <- function(formula, data, first_in_subtraction,
 
   subtraction_order <- paste0("(",eval(parse(text = paste0("'", first_in_subtraction, "'"))), " - ",
                               setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'")))), ")")
-  legend("topright", legend = c(paste("Obs diff =", round(obs.diff, 3)),
+  group_max <- tapply(response, predictor, quantile, 0.8)
+  legend(ifelse(group_max[1] > group_max[2], "topright", "topleft"), legend = c(paste("Obs diff =", round(obs.diff, 3)),
                                 subtraction_order),
          col = "white", bty = "n")
 
@@ -707,8 +716,11 @@ two_mean_test <- function(formula, data, first_in_subtraction,
     col.vec <- rep("grey80", length(cuts))
     col.vec[cuts == levels(cuts)[1]] ="red"
   }
+  range_diffs <- max(sim_diffs)-min(sim_diffs)
   plot(h, col = col.vec, main = "", ylab = "", xlab = "Difference in means",
-       yaxt = "n",
+       yaxt = "n",     xlim = c(min(min(sim_diffs), ifelse(direction == "two-sided", -abs(as_extreme_as)-range_diffs/5, as_extreme_as-range_diffs/5)),
+                                max(max(sim_diffs), ifelse(direction == "two-sided", abs(as_extreme_as)+range_diffs/5, as_extreme_as+range_diffs/5))),
+
        sub = paste("Count = ",
                    count_extreme,
                    "/", number_repetitions, " = ",
@@ -811,7 +823,7 @@ two_mean_bootstrap_CI <- function(formula, data, first_in_subtraction,
 #'
 #' @examples
 #' data(mtfires)
-#' mtfire$logHect  <- log(mtfires$Hectares)
+#' mtfires$logHect  <- log(mtfires$Hectares)
 #' regression_test(logHect~Temperature, data = mtfires,
 #'          direction = "greater", statistic = "correlation",
 #'          as_extreme_as = 1.388, number_repetitions = 1000)
@@ -879,8 +891,10 @@ regression_test <- function(formula, data,  statistic = c("slope", "correlation"
     col.vec <- rep("grey80", length(cuts))
     col.vec[cuts == levels(cuts)[1]] ="red"
   }
+  range_diffs <- max(sim_vals)-min(sim_vals)
   plot(h, col = col.vec, main = "", ylab = "", xlab = statistic,
-       yaxt = "n",
+       yaxt = "n",     xlim = c(min(min(sim_vals), ifelse(direction == "two-sided", -abs(as_extreme_as)-range_diffs/5, as_extreme_as-range_diffs/5)),
+                                max(max(sim_vals), ifelse(direction == "two-sided", abs(as_extreme_as)+range_diffs/5, as_extreme_as+range_diffs/5))),
        sub = paste("Count = ",
                    count_extreme,
                    "/", number_repetitions, " = ",
@@ -910,7 +924,7 @@ regression_test <- function(formula, data,  statistic = c("slope", "correlation"
 #'
 #' @examples
 #' data(mtfires)
-#' mtfire$logHect  <- log(mtfire$Hectares)
+#' mtfires$logHect  <- log(mtfires$Hectares)
 #' regression_bootstrap_CI(logHect~Temperature, data = mtfires, statistic = "correlation",
 #'              confidence_level = 0.9, number_repetitions = 1000)
 #' @export

@@ -31,7 +31,7 @@ Function to perform simulation-based test for slope of simple linear regression 
 }
 \examples{
 data(mtfires)
-mtfire$logHect  <- log(Hectares)
+mtfire$logHect  <- log(mtfires$Hectares)
 regression_test(logHect~Temperature, data = mtfires,
          direction = "greater", statistic = "correlation",
          as_extreme_as = 1.388, number_repetitions = 1000)
