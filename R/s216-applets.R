@@ -537,6 +537,148 @@ two_proportion_test <- function(formula, data, first_in_subtraction,
 }
 
 
+## Difference in means
+
+
+two_mean_test <- function(formula, data, first_in_subtraction,
+                          direction = c("greater", "less", "two-sided"),
+                          as_extreme_as, number_repetitions = 3){
+  if(!(direction %in% c("greater", "less", "two-sided")))
+    stop("direction must be 'greater', 'less', or 'two-sided'")
+  if(is.null(as_extreme_as))
+    stop("Must enter cutoff value for 'as_extreme_as")
+  if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
+    stop("number of repetitions must be positive and integer valued")
+  if(!(first_in_subtraction %in% c(unique(data[,1]), unique(data[,2]))))
+    stop("First term in order of subtraction must match values in data")
+  if(ncol(data) != 2)
+    stop("Data should have two variables")
+  n = nrow(data)
+
+  resp.name <- all.vars(formula)[1]
+  pred.name <- all.vars(formula)[2]
+  response <- eval(parse(text = paste0("data$", resp.name)))
+  predictor <- eval(parse(text = paste0("data$", pred.name)))
+  predictor <- factor(predictor)
+
+  obs.diff <- mean(response[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))]) -
+    mean(response[predictor == setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'"))))])
+
+
+  sim_diffs <- rep(NA, number_repetitions)
+  for(i in 1:number_repetitions){
+    newResponse <- sample(response)
+    sim_diffs[i] <- mean(newResponse[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))]) -
+      mean(newResponse[predictor == setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'"))))])
+  }
+  par(mfrow = c(1,2), mar = c(4,4,3,0)+0.1, mgp = c(2,.5,0))
+
+  boxplot(formula, data= data, main = "Observed Data")
+
+  subtraction_order <- paste0("(",eval(parse(text = paste0("'", first_in_subtraction, "'"))), " - ",
+                              setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'")))), ")")
+  legend("topright", legend = c(paste("Obs diff =", round(obs.diff, 3)),
+                                subtraction_order),
+         col = "white", bty = "n")
+
+  count_extreme <- ifelse(direction == "greater", sum(sim_diffs >= as_extreme_as),
+                          ifelse(direction == "less", sum(sim_diffs <= as_extreme_as),
+                                 sum(sim_diffs <= -abs(as_extreme_as)) +
+                                   sum(sim_diffs >= abs(as_extreme_as))))
+
+  h <- hist(sim_diffs, plot = FALSE, breaks = "FD")
+  if(direction == "two-sided"){
+    cuts <- cut(h$breaks, c(-Inf, -abs(as_extreme_as), abs(as_extreme_as), Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[1]] ="red"
+    col.vec[cuts == levels(cuts)[3]] ="red"
+  }else if (direction == "greater"){
+    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[2]] ="red"
+  }else{
+    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[1]] ="red"
+  }
+  plot(h, col = col.vec, main = "", ylab = "", xlab = "Average Difference",
+       yaxt = "n",
+       sub = paste("Count = ",
+                   count_extreme,
+                   "/", number_repetitions, " = ",
+                   round(count_extreme/number_repetitions,4), sep = ""))
+
+  legend("topright", legend = c(paste("Mean =", round(mean(sim_diffs, na.rm = T),3)),
+                                paste("SD =", round(sd(sim_diffs, na.rm = T),3))),
+         col = "white", bty = "n")
+  if(direction == "two-sided"){
+    abline(v = abs(as_extreme_as), col= "red", lwd = 2)
+    abline(v = -abs(as_extreme_as), col= "red", lwd = 2)
+  }else{
+    abline(v = as_extreme_as, col= "red", lwd = 2)
+  }
+}
+
+
+two_mean_bootstrap_CI <- function(formula, data, first_in_subtraction,
+                                  confidence_level = 0.95,
+                                  number_repetitions = 3){
+  if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
+    stop("number of repetitions must be positive and integer valued")
+  if(!(first_in_subtraction %in% c(unique(data[,1]), unique(data[,2]))))
+    stop("First term in order of subtraction must match values in data")
+  if(ncol(data) != 2)
+    stop("Data should have two variables")
+  n = nrow(data)
+
+  resp.name <- all.vars(formula)[1]
+  pred.name <- all.vars(formula)[2]
+  response <- eval(parse(text = paste0("data$", resp.name)))
+  predictor <- eval(parse(text = paste0("data$", pred.name)))
+  predictor <- factor(predictor)
+
+  obs.diff <- mean(response[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))]) -
+    mean(response[predictor == setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'"))))])
+
+  ng1 <- sum(predictor == eval(parse(text = paste0("'", first_in_subtraction, "'"))))
+  ng2 <- sum(predictor != eval(parse(text = paste0("'", first_in_subtraction, "'"))))
+  sim_diffs <- rep(NA, number_repetitions)
+  for(i in 1:number_repetitions){
+    newResponse <- rep(NA, length(response))
+    newResponse[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))] =
+      sample(response[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))], ng1, replace = TRUE)
+    newResponse[predictor != eval(parse(text = paste0("'", first_in_subtraction, "'")))] =
+      sample(response[predictor != eval(parse(text = paste0("'", first_in_subtraction, "'")))], ng2, replace = TRUE)
+
+    sim_diffs[i] <- mean(newResponse[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))]) -
+      mean(newResponse[predictor == setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'"))))])
+  }
+  low_ci <- quantile(sim_diffs, (1-confidence_level)/2)
+  high_ci <- quantile(sim_diffs, 1-(1-confidence_level)/2)
+
+  h <- hist(sim_diffs, plot = FALSE, breaks = "FD")
+
+  cuts <- cut(h$breaks, c(-Inf, low_ci, high_ci, Inf))
+  col.vec <- rep("grey80", length(cuts))
+  col.vec[cuts == levels(cuts)[1]] ="red"
+  col.vec[cuts == levels(cuts)[3]] ="red"
+
+  break_range <- max(h$breaks) - min(h$breaks)
+  plot(h, col = col.vec, main = "", ylab = "", xlim = c(min(min(h$breaks), low_ci-break_range/6),
+                                                        max(max(h$breaks), high_ci+break_range/6)),
+       xlab = "Bootstrap Mean Difference",
+       yaxt = "n", sub = paste0(100*confidence_level, "% CI: (",
+                                round(low_ci,3), ", ", round(high_ci,3), ")"))
+  abline(v = c(low_ci, high_ci), col= "red", lwd = 2)
+
+  cutoff_label <- c(paste(round(100*(1-confidence_level)/2, 1), "percentile"),
+                    paste(round(100*(1-(1-confidence_level)/2), 1), "percentile"))
+  text(c(low_ci, high_ci),
+       rep(max(h$counts),2), labels = cutoff_label,
+       pos = c(2, 4), cex = .75)
+}
+
+
 
 
 
