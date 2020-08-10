@@ -537,6 +537,93 @@ two_proportion_test <- function(formula, data, first_in_subtraction,
 }
 
 
+#' Function to build bootstrap confidence interval for the difference between two proportions
+#'
+#' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
+#' @param data Dataset with columns for response and predictor variable
+#' @param first_in_subtraction Value of predictor that should be first in order of subtraction for computing statistics
+#' @param response_value_numerator Value of response that corresponds to "success" computing proportions
+#' @param number_repetitions number of draws for bootstrap distribution
+#' @param confidence_level confidence level to use for interval construction in decimal form.  Default is 95%
+#'
+#' @return Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
+#'
+#' @examples
+#' data(pt)
+#' pt$twoSeconds <- ifelse(pt$responses >=2, "Yes", "No")
+#' two_proportion_bootstrap_CI(twoSeconds~brand, data = pt, first_in_subtraction = "B1", response_value_numerator = "Yes", number_repetitions = 100, confidence_level = 0.95)
+#'
+#' @export
+
+two_proportion_bootstrap_CI <- function(formula, data, first_in_subtraction,
+                                        response_value_numerator,
+                                        number_repetitions = 1, confidence_level = 0.95){
+  if(number_repetitions < 1 | number_repetitions %% 1 != 0)
+    stop("number of repetitions must be positive and integer valued")
+  resp.name <- all.vars(formula)[1]
+  pred.name <- all.vars(formula)[2]
+  eval(parse(text = paste0("data$", resp.name, " = factor(data$", resp.name, ")")))
+  eval(parse(text = paste0("data$", pred.name, " = factor(data$", pred.name, ")")))
+  response <- eval(parse(text = paste0("data$", resp.name)))
+  predictor <- eval(parse(text = paste0("data$", pred.name)))
+
+  if(!(first_in_subtraction %in% unique(predictor)))
+    stop("First term in order of subtraction must match values in data")
+  if(!(response_value_numerator %in% unique(response)))
+    stop("Value of response in numerator must match values in data")
+  if(confidence_level < 0 | confidence_level > 1)
+    stop("Confidence level must be given in decimal form")
+
+  row.pcts <- prop.table(table(predictor, response), 1)
+
+  obs.diff <- row.pcts[eval(parse(text = paste0("'", first_in_subtraction, "'"))),
+                       eval(parse(text = paste0("'", response_value_numerator, "'")))] -
+    row.pcts[setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'")))),
+             eval(parse(text = paste0("'", response_value_numerator, "'")))]
+
+  ng1 <- sum(predictor == eval(parse(text = paste0("'", first_in_subtraction, "'"))))
+  ng2 <- sum(predictor != eval(parse(text = paste0("'", first_in_subtraction, "'"))))
+  sim_diffs <- rep(NA, number_repetitions)
+  for(i in 1:number_repetitions){
+    newResponse <- response  #sets up as factor with correct levels
+    newResponse[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))] =
+      sample(response[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))], ng1, replace = TRUE)
+    newResponse[predictor != eval(parse(text = paste0("'", first_in_subtraction, "'")))] =
+      sample(response[predictor != eval(parse(text = paste0("'", first_in_subtraction, "'")))], ng2, replace = TRUE)
+
+    row.pcts <- prop.table(table(predictor, newResponse), 1)
+    sim_diffs[i] <- row.pcts[eval(parse(text = paste0("'", first_in_subtraction, "'"))),
+                             eval(parse(text = paste0("'", response_value_numerator, "'")))] -
+      row.pcts[setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'")))),
+               eval(parse(text = paste0("'", response_value_numerator, "'")))]
+  }
+
+  low_ci <- quantile(sim_diffs, (1-confidence_level)/2)
+  high_ci <- quantile(sim_diffs, 1-(1-confidence_level)/2)
+
+  h <- hist(sim_diffs, plot = FALSE, breaks = "FD")
+
+  cuts <- cut(h$breaks, c(-Inf, low_ci, high_ci, Inf))
+  col.vec <- rep("grey80", length(cuts))
+  col.vec[cuts == levels(cuts)[1]] ="red"
+  col.vec[cuts == levels(cuts)[3]] ="red"
+
+  break_range <- max(h$breaks) - min(h$breaks)
+  plot(h, col = col.vec, main = "", ylab = "", xlim = c(min(min(h$breaks), low_ci-break_range/6),
+                                                        max(max(h$breaks), high_ci+break_range/6)),
+       xlab = "Bootstrap Mean Difference",
+       yaxt = "n", sub = paste0(100*confidence_level, "% CI: (",
+                                round(low_ci,3), ", ", round(high_ci,3), ")"))
+  abline(v = c(low_ci, high_ci), col= "red", lwd = 2)
+
+  cutoff_label <- c(paste(round(100*(1-confidence_level)/2, 1), "percentile"),
+                    paste(round(100*(1-(1-confidence_level)/2), 1), "percentile"))
+  text(c(low_ci, high_ci),
+       rep(max(h$counts),2), labels = cutoff_label,
+       pos = c(2, 4), cex = .75)
+}
+
+
 #' Function to perform hypothesis test for equality of two means using simulation
 #' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
 #' @param data Dataset with columns for response and predictor variable
@@ -639,7 +726,7 @@ two_mean_test <- function(formula, data, first_in_subtraction,
 #' @param number_repetitions number of draws for simulation test
 #' @param confidence_level confidence level to use for interval construction in decimal form.  Default is 95%
 #'
-#' @return Produces side-by-side boxplots of observed data and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
+#' @return Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
 #'
 #' @examples
 #' data(pt)
@@ -658,6 +745,8 @@ two_mean_bootstrap_CI <- function(formula, data, first_in_subtraction,
   predictor <- eval(parse(text = paste0("data$", pred.name)))
   if(!(first_in_subtraction %in% unique(predictor)))
     stop("First term in order of subtraction must match values in data")
+  if(confidence_level < 0 | confidence_level > 1)
+    stop("Confidence level must be given in decimal form")
   n = nrow(data)
 
   obs.diff <- mean(response[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))]) -

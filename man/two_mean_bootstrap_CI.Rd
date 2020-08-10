@@ -24,7 +24,7 @@ two_mean_bootstrap_CI(
 \item{number_repetitions}{number of draws for simulation test}
 }
 \value{
-Produces side-by-side boxplots of observed data and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
+Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
 }
 \description{
 Function to create bootstrap confidence interval for difference in two means
