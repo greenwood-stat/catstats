@@ -35,7 +35,7 @@ Function to run simulation test for matched pairs
 \examples{
 set.seed(117)
 x <- rnorm(25)
-y <- x + 1 + rnorm(25, 0, .3)
+y <- x + 1 + rnorm(25, 0, 1.8)
 data <- data.frame(x,y)
 obs_diff <- mean(x - y)
 paired_test(data, shift = -obs_diff, direction = "two-sided", as_extreme_as = obs_diff,

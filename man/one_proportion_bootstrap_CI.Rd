@@ -14,11 +14,11 @@ one_proportion_bootstrap_CI(
 \arguments{
 \item{sample_size}{number of trials used to compute proportion}
 
+\item{number_successes}{how many successes were observed in those trials?}
+
 \item{number_repetitions}{number of draws for simulation test}
 
 \item{confidence_level}{confidence level for interval in decimal form.  Defaults to 95\%}
-
-\item{number_success}{how many successes were observed in those trials?}
 }
 \value{
 Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot

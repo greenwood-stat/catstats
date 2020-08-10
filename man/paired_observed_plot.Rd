@@ -18,7 +18,7 @@ Function to produce plot of observed matched pairs data
 \examples{
 set.seed(117)
 x <- rnorm(25)
-y <- x + 1 + rnorm(25, 0, .3)
+y <- x + 1 + rnorm(25, 0, 1.8)
 data <- data.frame(x,y)
 paired_observed_plot(data)
 }

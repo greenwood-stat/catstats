@@ -28,7 +28,7 @@ Function to create bootstrap confidence interval for slope of simple linear regr
 }
 \examples{
 data(mtfires)
-mtfire$logHect  <- log(mtfire$Hectares)
+mtfires$logHect  <- log(mtfires$Hectares)
 regression_bootstrap_CI(logHect~Temperature, data = mtfires, statistic = "correlation",
              confidence_level = 0.9, number_repetitions = 1000)
 }
