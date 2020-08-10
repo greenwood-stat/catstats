@@ -38,6 +38,8 @@ Function to perform hypothesis test for equality of two proportions using simula
 \examples{
 data(pt)
 pt$twoSeconds <- ifelse(pt$responses >=2, "Yes", "No")
-two_proportion_test(twoSeconds~brand, data = pt, first_in_subtraction = "B1", response_value_numerator = "Yes", number_repetitions = 100, as_extreme_as = -.4, direction = "two-sided")
+two_proportion_test(twoSeconds~brand, data = pt, first_in_subtraction = "B1",
+           response_value_numerator = "Yes", number_repetitions = 100, as_extreme_as = -.4,
+           direction = "two-sided")
 
 }

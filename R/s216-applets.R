@@ -9,7 +9,8 @@
 #' @param report_value value to return from simulations - "number" for number of successes or "proportion" for proportion of successes
 #' @return Plot of distribution of simulated values, with values as or more extreme than specified value highlighted and reports proportion of successes in simulations as subtitle on plot
 #' @examples
-#' one_proportion_test(probability_success = 0.5, sample_size = 150, number_repetitions = 100, as_extreme_as = 0.65, direction = "greater", return_value = "proportion")
+#' one_proportion_test(probability_success = 0.5, sample_size = 150, number_repetitions = 100,
+#'           as_extreme_as = 0.65, direction = "greater", report_value = "proportion")
 #' @export
 
 
@@ -168,7 +169,8 @@ one_proportion_test <- function(probability_success = 0.5,
 #'
 #' @return Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
 #' @examples
-#' one_proportion_bootstrap_CI(sample_size = 150, number_successes = 98, number_repetitions = 100, confidence_level = 0.99)
+#' one_proportion_bootstrap_CI(sample_size = 150, number_successes = 98, number_repetitions = 100,
+#'                       confidence_level = 0.99)
 #' @export
 
 one_proportion_bootstrap_CI <- function(sample_size, number_successes,
@@ -199,7 +201,7 @@ one_proportion_bootstrap_CI <- function(sample_size, number_successes,
        ylim = c(0, max(success_tab)+1),
        xlab = "Bootstrapped values of the proportion", ylab = "", yaxt = "n",
        sub = paste0(100*confidence_level, "% CI: (",
-                    low_ci, ", ", high_ci, ")"))
+                    round(low_ci, 3), ", ", round(high_ci,3), ")"))
   for(i in 1:length(success_tab)){
     lines(rep(as.numeric(names(success_tab)[i]),2), c(0, success_tab[i]), lwd = 5,
           col = ifelse(as.numeric(names(success_tab[i])) <= low_ci |
@@ -288,7 +290,8 @@ paired_observed_plot <- function(data){
 #' y <- x + 1 + rnorm(25, 0, .3)
 #' data <- data.frame(x,y)
 #' obs_diff <- mean(x - y)
-#' paired_test(data, shift = obs_diff, direction = "two-sided", as_extreme_as = obs_diff, number_repetitions = 100, which_first = 1)
+#' paired_test(data, shift = -obs_diff, direction = "two-sided", as_extreme_as = obs_diff,
+#'          number_repetitions = 100, which_first = 1)
 #' @export
 
 
@@ -447,7 +450,9 @@ paired_bootstrap_CI <- function(data, number_repetitions = 100, confidence_level
 #' @examples
 #' data(pt)
 #' pt$twoSeconds <- ifelse(pt$responses >=2, "Yes", "No")
-#' two_proportion_test(twoSeconds~brand, data = pt, first_in_subtraction = "B1", response_value_numerator = "Yes", number_repetitions = 100, as_extreme_as = -.4, direction = "two-sided")
+#' two_proportion_test(twoSeconds~brand, data = pt, first_in_subtraction = "B1",
+#'            response_value_numerator = "Yes", number_repetitions = 100, as_extreme_as = -.4,
+#'            direction = "two-sided")
 #'
 #' @export
 
@@ -519,7 +524,7 @@ two_proportion_test <- function(formula, data, first_in_subtraction,
     col.vec <- rep("grey80", length(cuts))
     col.vec[cuts == levels(cuts)[1]] ="red"
   }
-  plot(h, col = col.vec, main = "", ylab = "", xlab = "Average Difference",
+  plot(h, col = col.vec, main = "", ylab = "", xlab = "Difference in proportions",
        sub = paste("Count = ",
                    count_extreme,
                    "/", number_repetitions, " = ",
@@ -551,7 +556,8 @@ two_proportion_test <- function(formula, data, first_in_subtraction,
 #' @examples
 #' data(pt)
 #' pt$twoSeconds <- ifelse(pt$responses >=2, "Yes", "No")
-#' two_proportion_bootstrap_CI(twoSeconds~brand, data = pt, first_in_subtraction = "B1", response_value_numerator = "Yes", number_repetitions = 100, confidence_level = 0.95)
+#' two_proportion_bootstrap_CI(twoSeconds~brand, data = pt, first_in_subtraction = "B1",
+#'       response_value_numerator = "Yes", number_repetitions = 100, confidence_level = 0.95)
 #'
 #' @export
 
@@ -611,7 +617,7 @@ two_proportion_bootstrap_CI <- function(formula, data, first_in_subtraction,
   break_range <- max(h$breaks) - min(h$breaks)
   plot(h, col = col.vec, main = "", ylab = "", xlim = c(min(min(h$breaks), low_ci-break_range/6),
                                                         max(max(h$breaks), high_ci+break_range/6)),
-       xlab = "Bootstrap Mean Difference",
+       xlab = "Bootstrap Difference in Proportions",
        yaxt = "n", sub = paste0(100*confidence_level, "% CI: (",
                                 round(low_ci,3), ", ", round(high_ci,3), ")"))
   abline(v = c(low_ci, high_ci), col= "red", lwd = 2)
@@ -636,7 +642,8 @@ two_proportion_bootstrap_CI <- function(formula, data, first_in_subtraction,
 #'
 #' @examples
 #' data(pt)
-#' two_mean_test(responses~brand, data = pt, first_in_subtraction = "B1", number_repetitions = 100, as_extreme_as = -.4, direction = "two-sided")
+#' two_mean_test(responses~brand, data = pt, first_in_subtraction = "B1",
+#'           number_repetitions = 100, as_extreme_as = -.4, direction = "two-sided")
 #'
 #' @export
 
@@ -700,7 +707,7 @@ two_mean_test <- function(formula, data, first_in_subtraction,
     col.vec <- rep("grey80", length(cuts))
     col.vec[cuts == levels(cuts)[1]] ="red"
   }
-  plot(h, col = col.vec, main = "", ylab = "", xlab = "Average Difference",
+  plot(h, col = col.vec, main = "", ylab = "", xlab = "Difference in means",
        yaxt = "n",
        sub = paste("Count = ",
                    count_extreme,
@@ -730,7 +737,8 @@ two_mean_test <- function(formula, data, first_in_subtraction,
 #'
 #' @examples
 #' data(pt)
-#' two_mean_bootstrap_CI(responses~brand, data = pt, first_in_subtraction = "B1", number_repetitions = 100, confidence_level = 0.98)
+#' two_mean_bootstrap_CI(responses~brand, data = pt, first_in_subtraction = "B1",
+#'            number_repetitions = 100, confidence_level = 0.98)
 #'
 #' @export
 two_mean_bootstrap_CI <- function(formula, data, first_in_subtraction,
@@ -778,7 +786,7 @@ two_mean_bootstrap_CI <- function(formula, data, first_in_subtraction,
   break_range <- max(h$breaks) - min(h$breaks)
   plot(h, col = col.vec, main = "", ylab = "", xlim = c(min(min(h$breaks), low_ci-break_range/6),
                                                         max(max(h$breaks), high_ci+break_range/6)),
-       xlab = "Bootstrap Mean Difference",
+       xlab = "Bootstrap Difference in Means",
        yaxt = "n", sub = paste0(100*confidence_level, "% CI: (",
                                 round(low_ci,3), ", ", round(high_ci,3), ")"))
   abline(v = c(low_ci, high_ci), col= "red", lwd = 2)
@@ -790,7 +798,177 @@ two_mean_bootstrap_CI <- function(formula, data, first_in_subtraction,
        pos = c(2, 4), cex = .75)
 }
 
+#' Simulation-based test for regression
+#'
+#' Function to perform simulation-based test for slope of simple linear regression or correlation between two quantitative variables
+#'
+#' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
+#' @param data Dataset with columns for response and predictor variable
+#' @param statistic "slope" for test of slope or "correlation" for test of correlation
+#' @param as_extreme_as observed statistic
+#' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
+#' @param number_repetitions number of draws for simulation test
+#'
+#' @examples
+#' data(mtfires)
+#' mtfire$logHect  <- log(mtfires$Hectares)
+#' regression_test(logHect~Temperature, data = mtfires,
+#'          direction = "greater", statistic = "correlation",
+#'          as_extreme_as = 1.388, number_repetitions = 1000)
+#' @export
+
+regression_test <- function(formula, data,  statistic = c("slope", "correlation"),
+                            direction = c("greater", "less", "two-sided"),
+                            as_extreme_as, number_repetitions = 3){
+  if(!(statistic %in% c("slope", "correlation")))
+    stop("Statistic must be either slope or correlation")
+  if(!(direction %in% c("greater", "less", "two-sided")))
+    stop("direction must be 'greater', 'less', or 'two-sided'")
+  if(is.null(as_extreme_as))
+    stop("Must enter cutoff value for 'as_extreme_as")
+  if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
+    stop("number of repetitions must be positive and integer valued")
+
+  n = nrow(data)
+
+  resp.name <- all.vars(formula)[1]
+  pred.name <- all.vars(formula)[2]
+  response <- eval(parse(text = paste0("data$", resp.name)))
+  predictor <- eval(parse(text = paste0("data$", pred.name)))
+
+  obs.fit <- lm(formula, data = data)
+  obs.stat <- obs.fit$coef[2]
+
+  sim_vals <- rep(NA, number_repetitions)
+  for(i in 1:number_repetitions){
+    newResponse <- sample(response)
+    sim.fit <- lm(newResponse~predictor)
+    sim_vals[i] <- sim.fit$coef[2]
+  }
+
+  if(statistic == "correlation"){
+    sdRatio <- sd(response)/sd(predictor)
+    sim_vals <- sim_vals/sdRatio
+    obs.stat <- obs.stat/sdRatio
+  }
+  par(mfrow = c(1,2), mar = c(4,4,3,0)+0.1, mgp = c(2,.5,0))
+
+  plot(formula, data= data, main = "Observed Data", pch = 15)
+  abline(obs.fit$coef, col = "red", lwd = 2)
+
+  legend("topleft", legend = c(paste("Obs", statistic, "=", round(obs.stat, 3))),
+         col = "white", bty = "n", cex = 0.75)
+
+  count_extreme <- ifelse(direction == "greater", sum(sim_vals >= as_extreme_as),
+                          ifelse(direction == "less", sum(sim_vals <= as_extreme_as),
+                                 sum(sim_vals <= -abs(as_extreme_as)) +
+                                   sum(sim_vals >= abs(as_extreme_as))))
+
+  h <- hist(sim_vals, plot = FALSE, breaks = "FD")
+  if(direction == "two-sided"){
+    cuts <- cut(h$breaks, c(-Inf, -abs(as_extreme_as), abs(as_extreme_as), Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[1]] ="red"
+    col.vec[cuts == levels(cuts)[3]] ="red"
+  }else if (direction == "greater"){
+    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[2]] ="red"
+  }else{
+    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[1]] ="red"
+  }
+  plot(h, col = col.vec, main = "", ylab = "", xlab = statistic,
+       yaxt = "n",
+       sub = paste("Count = ",
+                   count_extreme,
+                   "/", number_repetitions, " = ",
+                   round(count_extreme/number_repetitions,4), sep = ""))
+
+  legend("topright", legend = c(paste("Mean =", round(mean(sim_vals, na.rm = T),3)),
+                                paste("SD =", round(sd(sim_vals, na.rm = T),3))),
+         col = "white", bty = "n")
+  if(direction == "two-sided"){
+    abline(v = abs(as_extreme_as), col= "red", lwd = 2)
+    abline(v = -abs(as_extreme_as), col= "red", lwd = 2)
+  }else{
+    abline(v = as_extreme_as, col= "red", lwd = 2)
+  }
+}
 
 
+#' Bootstrap confidence intervals for regression
+#'
+#' Function to create bootstrap confidence interval for slope of simple linear regression or correlation between two quantitative variables
+#'
+#' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
+#' @param data Dataset with columns for response and predictor variable
+#' @param statistic "slope" for test of slope or "correlation" for test of correlation
+#' @param confidence_level confidence level to use for interval in decimal form.  Default is for 95% CI
+#' @param number_repetitions number of draws for bootstrap simulation
+#'
+#' @examples
+#' data(mtfires)
+#' mtfire$logHect  <- log(mtfire$Hectares)
+#' regression_bootstrap_CI(logHect~Temperature, data = mtfires, statistic = "correlation",
+#'              confidence_level = 0.9, number_repetitions = 1000)
+#' @export
+
+regression_bootstrap_CI <- function(formula, data, confidence_level = 0.95,
+                                    statistic = c("slope", "correlation"),
+                                    number_repetitions = 3){
+  if(!(statistic %in% c("slope", "correlation")))
+    stop("Statistic must be either slope or correlation")
+  if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
+    stop("number of repetitions must be positive and integer valued")
+  if(confidence_level < 0 | confidence_level > 1)
+    stop("Confidence level must be given in decimal form")
+
+  n = nrow(data)
+
+  resp.name <- all.vars(formula)[1]
+  pred.name <- all.vars(formula)[2]
+  response <- eval(parse(text = paste0("data$", resp.name)))
+  predictor <- eval(parse(text = paste0("data$", pred.name)))
+
+  sim_vals <- rep(NA, number_repetitions)
+  for(i in 1:number_repetitions){
+    sample_obs <- sample(n, n, replace = TRUE)
+    newResponse <- response[sample_obs]
+    newPred <- predictor[sample_obs]
+    sim.fit <- lm(newResponse~newPred)
+    sim_vals[i] <- sim.fit$coef[2]
+  }
+
+  if(statistic == "correlation"){
+    sdRatio <- sd(response)/sd(predictor)
+    sim_vals <- sim_vals/sdRatio
+  }
+
+  low_ci <- quantile(sim_vals, (1-confidence_level)/2)
+  high_ci <- quantile(sim_vals, 1-(1-confidence_level)/2)
+
+  h <- hist(sim_vals, plot = FALSE, breaks = "FD")
+
+  cuts <- cut(h$breaks, c(-Inf, low_ci, high_ci, Inf))
+  col.vec <- rep("grey80", length(cuts))
+  col.vec[cuts == levels(cuts)[1]] ="red"
+  col.vec[cuts == levels(cuts)[3]] ="red"
+
+  break_range <- max(h$breaks) - min(h$breaks)
+  plot(h, col = col.vec, main = "", ylab = "", xlim = c(min(min(h$breaks), low_ci-break_range/6),
+                                                        max(max(h$breaks), high_ci+break_range/6)),
+       xlab = paste("Bootstrap", statistic),
+       yaxt = "n", sub = paste0(100*confidence_level, "% CI: (",
+                                round(low_ci,3), ", ", round(high_ci,3), ")"))
+  abline(v = c(low_ci, high_ci), col= "red", lwd = 2)
+
+  cutoff_label <- c(paste(round(100*(1-confidence_level)/2, 1), "percentile"),
+                    paste(round(100*(1-(1-confidence_level)/2), 1), "percentile"))
+  text(c(low_ci, high_ci),
+       rep(max(h$counts),2), labels = cutoff_label,
+       pos = c(2, 4), cex = .75)
+}
 
 

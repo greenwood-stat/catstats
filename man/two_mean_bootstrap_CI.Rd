@@ -31,6 +31,7 @@ Function to create bootstrap confidence interval for difference in two means
 }
 \examples{
 data(pt)
-two_mean_bootstrap_CI(responses~brand, data = pt, first_in_subtraction = "B1", number_repetitions = 100, confidence_level = 0.98)
+two_mean_bootstrap_CI(responses~brand, data = pt, first_in_subtraction = "B1",
+           number_repetitions = 100, confidence_level = 0.98)
 
 }

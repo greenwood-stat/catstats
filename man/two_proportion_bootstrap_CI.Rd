@@ -35,6 +35,7 @@ Function to build bootstrap confidence interval for the difference between two p
 \examples{
 data(pt)
 pt$twoSeconds <- ifelse(pt$responses >=2, "Yes", "No")
-two_proportion_bootstrap_CI(twoSeconds~brand, data = pt, first_in_subtraction = "B1", response_value_numerator = "Yes", number_repetitions = 100, confidence_level = 0.95)
+two_proportion_bootstrap_CI(twoSeconds~brand, data = pt, first_in_subtraction = "B1",
+      response_value_numerator = "Yes", number_repetitions = 100, confidence_level = 0.95)
 
 }

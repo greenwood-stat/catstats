@@ -27,5 +27,6 @@ Produces plot of distribution of bootstrapped values, with values as or more ext
 Function to produce bootstrap confidence interval for one proportion
 }
 \examples{
-one_proportion_bootstrap_CI(sample_size = 150, number_successes = 98, number_repetitions = 100, confidence_level = 0.99)
+one_proportion_bootstrap_CI(sample_size = 150, number_successes = 98, number_repetitions = 100,
+                      confidence_level = 0.99)
 }

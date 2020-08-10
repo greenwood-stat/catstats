@@ -33,5 +33,6 @@ Plot of distribution of simulated values, with values as or more extreme than sp
 This function will run a simulation-based hypothesis test for the value of a single proportion.
 }
 \examples{
-one_proportion_test(probability_success = 0.5, sample_size = 150, number_repetitions = 100, as_extreme_as = 0.65, direction = "greater", return_value = "proportion")
+one_proportion_test(probability_success = 0.5, sample_size = 150, number_repetitions = 100,
+          as_extreme_as = 0.65, direction = "greater", return_value = "proportion")
 }

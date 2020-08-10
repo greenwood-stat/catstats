@@ -38,5 +38,6 @@ x <- rnorm(25)
 y <- x + 1 + rnorm(25, 0, .3)
 data <- data.frame(x,y)
 obs_diff <- mean(x - y)
-paired_test(data, shift = obs_diff, direction = "two-sided", as_extreme_as = obs_diff, number_repetitions = 100, which_first = 1)
+paired_test(data, shift = obs_diff, direction = "two-sided", as_extreme_as = obs_diff,
+         number_repetitions = 100, which_first = 1)
 }

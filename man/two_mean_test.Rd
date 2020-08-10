@@ -34,6 +34,7 @@ Function to perform hypothesis test for equality of two means using simulation
 }
 \examples{
 data(pt)
-two_mean_test(responses~brand, data = pt, first_in_subtraction = "B1", number_repetitions = 100, as_extreme_as = -.4, direction = "two-sided")
+two_mean_test(responses~brand, data = pt, first_in_subtraction = "B1",
+          number_repetitions = 100, as_extreme_as = -.4, direction = "two-sided")
 
 }
