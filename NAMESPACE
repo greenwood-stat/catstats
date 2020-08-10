@@ -2,3 +2,8 @@
 
 export(intplot)
 export(intplotarray)
+export(one_proportion_bootstrap_CI)
+export(one_proportion_test)
+export(paired_bootstrap_CI)
+export(paired_observed_plot)
+export(paired_test)

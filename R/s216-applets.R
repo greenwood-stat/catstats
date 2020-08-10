@@ -1,16 +1,17 @@
-###############
-#Function to reproduce one proportion test applet
-#Arguments: 
-#probability_success: value between 0 and 1, represents null hypothesis value for proportion
-#sample_size: number of trials used to compute proportion
-#number_repetitions: number of draws for simulation test
-#as_extreme_as: observed statistic (between 0 and 1)
-#direction: one of "greater", "less", or "two-sided" to give direction of hypothsis test
-#report_value: value to return from simulations - "number" for number of successes or "proportion" for proportion of successes
-#
-#Returns: produced plot of distribution of simulated values, with values as or more extreme
-#than specified value highlighted and reports proportion of successes in simulations as subtitle on plot
-###############
+#' One proportion simulation-based hypothesis test
+#'
+#' This function will run a simulation-based hypothesis test for the value of a single proportion.
+#' @param probability_success value between 0 and 1, represents null hypothesis value for proportion
+#' @param sample_size number of trials used to compute proportion
+#' @param number_repetitions number of draws for simulation test
+#' @param as_extreme_as observed statistic (between 0 and 1)
+#' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
+#' @param report_value value to return from simulations - "number" for number of successes or "proportion" for proportion of successes
+#' @return Plot of distribution of simulated values, with values as or more extreme than specified value highlighted and reports proportion of successes in simulations as subtitle on plot
+#' @examples
+#' one_proportion_test(probability_success = 0.5, sample_size = 150, number_repetitions = 100, as_extreme_as = 0.65, direction = "greater", return_value = "proportion")
+#' @export
+
 
 one_proportion_test <- function(probability_success = 0.5,
                                 sample_size = 5,
@@ -30,11 +31,11 @@ one_proportion_test <- function(probability_success = 0.5,
     stop("Value to report must be either 'number' or 'proportion' of successes")
   if(is.null(as_extreme_as))
     stop("Must enter cutoff value for 'as_extreme_as")
-  
+
   number_heads <- rbinom(number_repetitions, sample_size, probability_success)
   range_heads <- max(number_heads) - min(number_heads)
   success_tab = table(number_heads)
-  
+
   if(!(direction == "two-sided")){
     if(report_value == "number"){
       proportion_extreme <- ifelse(direction == "greater",
@@ -45,53 +46,53 @@ one_proportion_test <- function(probability_success = 0.5,
                                    mean(number_heads/sample_size >= as_extreme_as),
                                    mean(number_heads/sample_size <= as_extreme_as))
     }
-    
+
     if(report_value == "number"){
-      plot(0,0, "n", xlim = c(min(min(number_heads), as_extreme_as-range_heads/5), 
+      plot(0,0, "n", xlim = c(min(min(number_heads), as_extreme_as-range_heads/5),
                               max(max(number_heads), as_extreme_as + range_heads/5)),
            ylim = c(0, max(success_tab)+1),
            xlab = "Number of successes", ylab = "", yaxt ="n",
-           sub = paste("Proportion of Samples = ", 
-                       proportion_extreme*number_repetitions, 
-                       "/", number_repetitions, " = ", 
+           sub = paste("Proportion of Samples = ",
+                       proportion_extreme*number_repetitions,
+                       "/", number_repetitions, " = ",
                        round(proportion_extreme,4), sep = ""))
       for(i in 1:length(success_tab)){
-        lines(rep(names(success_tab)[i],2), c(0, success_tab[i]), lwd = 5, 
+        lines(rep(names(success_tab)[i],2), c(0, success_tab[i]), lwd = 5,
               col = ifelse(direction == "greater",
                            ifelse(as.numeric(names(success_tab[i])) >= as_extreme_as, "blue", "black"),
                            ifelse(as.numeric(names(success_tab[i])) <= as_extreme_as, "blue", "black")))
       }
-      abline(v = ifelse(direction == "greater", as_extreme_as-0.5, as_extreme_as + 0.5), 
+      abline(v = ifelse(direction == "greater", as_extreme_as-0.5, as_extreme_as + 0.5),
              col = "blue", lwd = 2)
       cutoff_label <- ifelse(direction == "greater",
                              paste(">=", as_extreme_as),
                              paste("<=", as_extreme_as))
-      text(ifelse(direction == "greater", as_extreme_as-0.25, as_extreme_as+0.25), 
+      text(ifelse(direction == "greater", as_extreme_as-0.25, as_extreme_as+0.25),
            max(success_tab), labels = cutoff_label,
            pos = ifelse(direction == "greater", 4, 2))
     }else{
-      plot(0,0, "n", xlim =c(min(min(number_heads)/sample_size, as_extreme_as-range_heads/(5*sample_size)), 
+      plot(0,0, "n", xlim =c(min(min(number_heads)/sample_size, as_extreme_as-range_heads/(5*sample_size)),
                              max(max(number_heads)/sample_size, as_extreme_as + range_heads/(5*sample_size))),
            ylim = c(0, max(success_tab)+1),
            xlab = "Proportion of successes", ylab = "", yaxt ="n",
-           sub = paste("Proportion of Samples = ", 
-                       proportion_extreme*number_repetitions, 
-                       "/", number_repetitions, " = ", 
+           sub = paste("Proportion of Samples = ",
+                       proportion_extreme*number_repetitions,
+                       "/", number_repetitions, " = ",
                        round(proportion_extreme,4), sep = ""))
       for(i in 1:length(success_tab)){
-        lines(rep(as.numeric(names(success_tab)[i])/sample_size,2), c(0, success_tab[i]), lwd = 5, 
+        lines(rep(as.numeric(names(success_tab)[i])/sample_size,2), c(0, success_tab[i]), lwd = 5,
               col = ifelse(direction == "greater",
-                           ifelse(as.numeric(names(success_tab[i]))/sample_size >= as_extreme_as, 
+                           ifelse(as.numeric(names(success_tab[i]))/sample_size >= as_extreme_as,
                                   "blue", "black"),
-                           ifelse(as.numeric(names(success_tab[i]))/sample_size <= as_extreme_as, 
+                           ifelse(as.numeric(names(success_tab[i]))/sample_size <= as_extreme_as,
                                   "blue", "black")))
       }
-      abline(v = ifelse(direction == "greater", as_extreme_as-0.5/sample_size, 
+      abline(v = ifelse(direction == "greater", as_extreme_as-0.5/sample_size,
                         as_extreme_as + 0.5/sample_size), col = "blue", lwd = 2)
       cutoff_label <- ifelse(direction == "greater",
                              paste(">=", as_extreme_as),
                              paste("<=", as_extreme_as))
-      text(ifelse(direction == "greater", as_extreme_as-0.25/sample_size, as_extreme_as+0.25/sample_size), 
+      text(ifelse(direction == "greater", as_extreme_as-0.25/sample_size, as_extreme_as+0.25/sample_size),
            max(success_tab), labels = cutoff_label,
            pos = ifelse(direction == "greater", 4, 2))
     }
@@ -104,24 +105,24 @@ one_proportion_test <- function(probability_success = 0.5,
       upper = min(sample_size, 2*probability_success*sample_size-as_extreme_as)
     }
     proportion_extreme <- mean(number_heads <= lower | number_heads >= upper)
-    
-    plot(0,0, "n", xlim = c(min(min(number_heads), lower-range_heads/5), 
+
+    plot(0,0, "n", xlim = c(min(min(number_heads), lower-range_heads/5),
                             max(max(number_heads), upper + range_heads/5)),
          ylim = c(0, max(success_tab)+1),
          xlab = "Number of successes", ylab = "", yaxt ="n",
-         sub = paste("Proportion of Samples = ", 
-                     proportion_extreme*number_repetitions, 
-                     "/", number_repetitions, " = ", 
+         sub = paste("Proportion of Samples = ",
+                     proportion_extreme*number_repetitions,
+                     "/", number_repetitions, " = ",
                      round(proportion_extreme,4), sep = ""))
     for(i in 1:length(success_tab)){
-      lines(rep(names(success_tab)[i],2), c(0, success_tab[i]), lwd = 5, 
+      lines(rep(names(success_tab)[i],2), c(0, success_tab[i]), lwd = 5,
             col = ifelse(as.numeric(names(success_tab[i])) <= lower |
                            as.numeric(names(success_tab[i])) >= upper, "blue", "black"))
     }
-    abline(v = c(lower + 0.5, upper - 0.5), 
+    abline(v = c(lower + 0.5, upper - 0.5),
            col = "blue", lwd = 2)
     cutoff_label <- c(paste("<=", lower), paste(">=", upper))
-    text(c(lower-0.25, upper+0.25), 
+    text(c(lower-0.25, upper+0.25),
          rep(max(success_tab),2), labels = cutoff_label,
          pos = c(4, 2))
   }else{
@@ -133,44 +134,44 @@ one_proportion_test <- function(probability_success = 0.5,
       upper = min(1, 2*probability_success-as_extreme_as)
     }
     proportion_extreme <- mean(number_heads <= lower*sample_size | number_heads >= upper*sample_size)
-    
-    plot(0,0, "n", xlim =c(min(min(number_heads)/sample_size, lower-range_heads/(5*sample_size)), 
+
+    plot(0,0, "n", xlim =c(min(min(number_heads)/sample_size, lower-range_heads/(5*sample_size)),
                            max(max(number_heads)/sample_size, upper + range_heads/(5*sample_size))),
          ylim = c(0, max(success_tab)+1),
          xlab = "Proportion of successes", ylab = "", yaxt ="n",
-         sub = paste("Proportion of Samples = ", 
-                     proportion_extreme*number_repetitions, 
-                     "/", number_repetitions, " = ", 
+         sub = paste("Proportion of Samples = ",
+                     proportion_extreme*number_repetitions,
+                     "/", number_repetitions, " = ",
                      round(proportion_extreme,4), sep = ""))
     for(i in 1:length(success_tab)){
-      lines(rep(as.numeric(names(success_tab)[i])/sample_size,2), c(0, success_tab[i]), lwd = 5, 
+      lines(rep(as.numeric(names(success_tab)[i])/sample_size,2), c(0, success_tab[i]), lwd = 5,
             col = ifelse(as.numeric(names(success_tab[i]))/sample_size <= lower |
                            as.numeric(names(success_tab[i]))/sample_size >= upper, "blue", "black"))
     }
-    abline(v = c(lower + 0.5/sample_size, upper - 0.5/sample_size), 
+    abline(v = c(lower + 0.5/sample_size, upper - 0.5/sample_size),
            col = "blue", lwd = 2)
     cutoff_label <- c(paste("<=", lower), paste(">=", upper))
-    text(c(lower+0.25/sample_size, upper-0.25/sample_size), 
+    text(c(lower+0.25/sample_size, upper-0.25/sample_size),
          rep(max(success_tab),2), labels = cutoff_label,
          pos = c(2, 4))
   }
-  
+
 }
 
 
-###############
-#Function to produce bootstrap CI for one proportion
-#Arguments: 
-#sample_size: number of trials used to compute proportion
-#number_success: how many successes were observed in those trials?
-#number_repetitions: number of draws for simulation test
-#confidence level: confidence level for interval in decimal form.  Defaults to 95%
-#
-#Returns: produced plot of distribution of bootstrapped values, with values as or more extreme
-#than confidence interval range highlighted and reports CI as subtitle on plot
-###############
+#' Function to produce bootstrap confidence interval for one proportion
+#'
+#' @param sample_size number of trials used to compute proportion
+#' @param number_success how many successes were observed in those trials?
+#' @param number_repetitions number of draws for simulation test
+#' @param confidence_level confidence level for interval in decimal form.  Defaults to 95%
+#'
+#' @return Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
+#' @examples
+#' one_proportion_bootstrap_CI(sample_size = 150, number_successes = 98, number_repetitions = 100, confidence_level = 0.99)
+#' @export
 
-one_proportion_bootstrap_CI <- function(sample_size, number_successes,                        
+one_proportion_bootstrap_CI <- function(sample_size, number_successes,
                                         number_repetitions = 100, confidence_level = 0.95){
   if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
     stop("number of repetitions must be positive and integer valued")
@@ -180,49 +181,55 @@ one_proportion_bootstrap_CI <- function(sample_size, number_successes,
     stop("sample size must be positive and integer valued")
   if(confidence_level < 0 | confidence_level > 1)
     stop("Confidence level must be given in decimal form")
-  
+
   sim_pop <- rep(0, sample_size)
   sim_pop[1:number_successes] <- 1
-  
+
   sim_props <- rep(NA, number_repetitions)
   for(i in 1:number_repetitions){
     sim_props[i] <- mean(sample(sim_pop, sample_size, replace = TRUE))
   }
-  
+
   success_tab = table(sim_props)
-  
+
   low_ci <- quantile(sim_props, (1-confidence_level)/2)
   high_ci <- quantile(sim_props, 1-(1-confidence_level)/2)
-  
+
   plot(0,0, "n", xlim = c(min(min(sim_props), low_ci-(max(sim_props)-min(sim_props))/5), max(sim_props)),
        ylim = c(0, max(success_tab)+1),
        xlab = "Bootstrapped values of the proportion", ylab = "", yaxt = "n",
-       sub = paste0(100*confidence_level, "% CI: (", 
+       sub = paste0(100*confidence_level, "% CI: (",
                     low_ci, ", ", high_ci, ")"))
   for(i in 1:length(success_tab)){
-    lines(rep(as.numeric(names(success_tab)[i]),2), c(0, success_tab[i]), lwd = 5, 
+    lines(rep(as.numeric(names(success_tab)[i]),2), c(0, success_tab[i]), lwd = 5,
           col = ifelse(as.numeric(names(success_tab[i])) <= low_ci |
                          as.numeric(names(success_tab[i])) >= high_ci, "blue", "black"))
   }
-  abline(v = c(low_ci, high_ci), 
+  abline(v = c(low_ci, high_ci),
          col = "blue", lwd = 2)
-  cutoff_label <- c(paste(round(100*(1-confidence_level)/2, 1), "percentile"), 
+  cutoff_label <- c(paste(round(100*(1-confidence_level)/2, 1), "percentile"),
                     paste(round(100*(1-(1-confidence_level)/2), 1), "percentile"))
-  text(c(low_ci, high_ci), 
+  text(c(low_ci, high_ci),
        rep(max(success_tab),2), labels = cutoff_label,
        pos = c(2, 4), cex = .75)
 }
 
 
 
-###############
-#Function to reproduce plot of observed matched pairs data
-#Arguments: 
-#data: two- or three-column data frame, with values for each group in last two columns
-#
-#Returns: produced plot of distribution of observed values, with means & SDs in groups and 
-#paired observations linked by a line segment
-###############
+#' Function to produce plot of observed matched pairs data
+#'
+#' @param data two- or three-column data frame, with values for each group in last two columns
+#'
+#' @return Produces plot of distribution of observed values, with means & SDs in groups and paired observations linked by a line segment
+#'
+#' @examples
+#' set.seed(117)
+#' x <- rnorm(25)
+#' y <- x + 1 + rnorm(25, 0, .3)
+#' data <- data.frame(x,y)
+#' paired_observed_plot(data)
+#' @export
+
 
 
 
@@ -231,18 +238,18 @@ paired_observed_plot <- function(data){
     stop("Data should have two or three variables")
   if(ncol(data) == 3)
     data <- data[,2:3]
-  
+
   differences = data[,1]-data[,2]
   par(mfrow = c(2,1), mgp = c(2, .5, 0), mar = c(4,4,0,0)+.1)
   plot(0,0, "n", xlim = c(min(data), max(data)),
-       ylim = c(0,5), yaxt = "n", xlab = "Outcomes", 
+       ylim = c(0,5), yaxt = "n", xlab = "Outcomes",
        ylab = "")
   points(data[,1], rep(0.5, nrow(data)), pch = 15, col = "blue")
   points(data[,2],rep(3, nrow(data)), pch = 15, col = "red")
   for(i in 1:nrow(data)){
     lines(c(data[i,]), c(.5, 3))
   }
-  
+
   leg.loc = min(data) + 0.85*(max(data)-min(data))
   legend(leg.loc,5, col = "white", bty = "n",
          legend = c(dimnames(data)[[2]][1], paste("Mean =", round(mean(data[,1],na.rm = T), 3)),
@@ -252,9 +259,9 @@ paired_observed_plot <- function(data){
          legend = c(dimnames(data)[[2]][2], paste("Mean =", round(mean(data[,2],na.rm = T), 3)),
                     paste("SD =", round(sd(data[,2], na.rm = T), 3))),
          text.col = "blue", cex = 0.75)
-  
-  
-  
+
+
+
   hist(differences, xlab = "Differences",
        ylab = "", col = "grey80",
        main = "", breaks = round(nrow(data)/3))
@@ -265,19 +272,24 @@ paired_observed_plot <- function(data){
 
 
 
-###############
-#Function to run simulation test for matched pairs
-#Arguments: 
-#data: vector of differences or a two- or three-column data frame, with values for each group in last two columns
-#shift: amount to shift differences for bootstrapping of null distribution
-#number_repetitions: number of draws for simulation test
-#as_extreme_as: observed statistic
-#direction: one of "greater", "less", or "two-sided" to give direction of hypothsis test
-#which_first: For order of subtraction - which column should be first?
-#
-#Returns: produced plot of distribution of simulated values, with values as or more extreme
-#than specified value highlighted and count/proportion of those values reported as subtitle on plot
-###############
+#' Function to run simulation test for matched pairs
+#'
+#' @param data vector of differences or a two- or three-column data frame, with values for each group in last two columns
+#' @param shift amount to shift differences for bootstrapping of null distribution
+#' @param number_repetitions number of draws for simulation test
+#' @param as_extreme_as observed statistic
+#' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
+#' @param which_first For order of subtraction - which column should be first?
+#'
+#' @return Produces plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
+#' @examples
+#' set.seed(117)
+#' x <- rnorm(25)
+#' y <- x + 1 + rnorm(25, 0, .3)
+#' data <- data.frame(x,y)
+#' obs_diff <- mean(x - y)
+#' paired_test(data, shift = obs_diff, direction = "two-sided", as_extreme_as = obs_diff, number_repetitions = 100, which_first = 1)
+#' @export
 
 
 paired_test <- function(data, shift = 0, direction = c("greater", "less", "two-sided"),
@@ -302,18 +314,18 @@ paired_test <- function(data, shift = 0, direction = c("greater", "less", "two-s
         differences = data[,which_first]-data[,ifelse(which_first == 1, 2, 1)]
         n = nrow(data)
     }
-    
+
     obs_diff <- mean(differences)
     sim_diffs <- rep(NA, number_repetitions)
     for(i in 1:number_repetitions){
         sim_diffs[i] <- mean(sample(x = differences+shift, size = n, replace = TRUE))
     }
-    
+
     count_extreme <- ifelse(direction == "greater", sum(sim_diffs >= as_extreme_as),
                             ifelse(direction == "less", sum(sim_diffs <= as_extreme_as),
-                                   sum(sim_diffs <= -abs(as_extreme_as)) + 
+                                   sum(sim_diffs <= -abs(as_extreme_as)) +
                                        sum(sim_diffs >= abs(as_extreme_as))))
-    
+
     h <- hist(sim_diffs, plot = FALSE, breaks = "FD")
     if(direction == "two-sided"){
         cuts <- cut(h$breaks, c(-Inf, -abs(as_extreme_as), abs(as_extreme_as), Inf))
@@ -330,11 +342,11 @@ paired_test <- function(data, shift = 0, direction = c("greater", "less", "two-s
         col.vec[cuts == levels(cuts)[1]] ="red"
     }
     plot(h, col = col.vec, main = "", ylab = "", xlab = "Average Difference",
-         yaxt = "n", sub = paste("Count = ", 
-                                 count_extreme, 
-                                 "/", number_repetitions, " = ", 
+         yaxt = "n", sub = paste("Count = ",
+                                 count_extreme,
+                                 "/", number_repetitions, " = ",
                                  round(count_extreme/number_repetitions,4), sep = ""))
-    
+
     legend("topright", legend = c(paste("Mean =", round(mean(sim_diffs, na.rm = T),3)),
                                   paste("SD =", round(sd(sim_diffs, na.rm = T),3))),
            col = "white", bty = "n")
@@ -347,17 +359,23 @@ paired_test <- function(data, shift = 0, direction = c("greater", "less", "two-s
 }
 
 
-###############
-#Function to run bootstrap confidence intervalt for matched pairs
-#Arguments: 
-#data: vector of differences or a two- or three-column data frame, with values for each group in last two columns
-#number_repetitions: number of draws for bootstrap simulation
-#which_first: For order of subtraction - which column should be first?
-#confidence level: confidence level for interval in decimal form.  Defaults to 95%
-#
-#Returns: produced plot of distribution of bootstrapped values, with values as or more extreme
-#than confidence interval range highlighted and reports CI as subtitle on plot
-###############
+#' Function to run bootstrap confidence intervalt for matched pairs data
+#'
+#' @param data vector of differences or a two- or three-column data frame, with values for each group in last two columns
+#' @param number_repetitions number of draws for bootstrap simulation
+#' @param which_first For order of subtraction - which column should be first?
+#' @param confidence_level confidence level for interval in decimal form.  Defaults to 95%
+#'
+#' @return Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
+#'
+#' @examples
+#' set.seed(117)
+#' x <- rnorm(25)
+#' y <- x + 1 + rnorm(25, 0, .3)
+#' data <- data.frame(x,y)
+#' paired_bootstrap_CI(data, number_repetitions = 100, confidence_level = 0.9, which_first = 1)
+#' @export
+
 
 paired_bootstrap_CI <- function(data, number_repetitions = 100, confidence_level = 0.95,
                                 which_first = 1){
@@ -379,37 +397,37 @@ paired_bootstrap_CI <- function(data, number_repetitions = 100, confidence_level
         differences = data[,which_first]-data[,ifelse(which_first == 1, 2, 1)]
         n = nrow(data)
     }
-    
-    
+
+
     obs_diff <- mean(differences)
     sim_diffs <- rep(NA, number_repetitions)
-    
+
     for(i in 1:number_repetitions){
         boot_samp <- sample(differences, n, replace = TRUE)
         sim_diffs[i] <- mean(boot_samp)
     }
-    
+
     low_ci <- quantile(sim_diffs, (1-confidence_level)/2)
     high_ci <- quantile(sim_diffs, 1-(1-confidence_level)/2)
-    
+
     h <- hist(sim_diffs, plot = FALSE, breaks = "FD")
-    
+
     cuts <- cut(h$breaks, c(-Inf, low_ci, high_ci, Inf))
     col.vec <- rep("grey80", length(cuts))
     col.vec[cuts == levels(cuts)[1]] ="red"
     col.vec[cuts == levels(cuts)[3]] ="red"
-    
+
     break_range <- max(h$breaks) - min(h$breaks)
     plot(h, col = col.vec, main = "", ylab = "", xlim = c(min(min(h$breaks), low_ci-break_range/6),
                                                           max(max(h$breaks), high_ci+break_range/6)),
          xlab = "Bootstrap Mean Difference",
-         yaxt = "n", sub = paste0(100*confidence_level, "% CI: (", 
+         yaxt = "n", sub = paste0(100*confidence_level, "% CI: (",
                                   round(low_ci,3), ", ", round(high_ci,3), ")"))
     abline(v = c(low_ci, high_ci), col= "red", lwd = 2)
-    
-    cutoff_label <- c(paste(round(100*(1-confidence_level)/2, 1), "percentile"), 
+
+    cutoff_label <- c(paste(round(100*(1-confidence_level)/2, 1), "percentile"),
                       paste(round(100*(1-(1-confidence_level)/2), 1), "percentile"))
-    text(c(low_ci, high_ci), 
+    text(c(low_ci, high_ci),
          rep(max(h$counts),2), labels = cutoff_label,
          pos = c(2, 4), cex = .75)
 }
