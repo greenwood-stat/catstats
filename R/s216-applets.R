@@ -431,3 +431,112 @@ paired_bootstrap_CI <- function(data, number_repetitions = 100, confidence_level
          rep(max(h$counts),2), labels = cutoff_label,
          pos = c(2, 4), cex = .75)
 }
+
+
+#' Function to perform hypothesis test for equality of two proportions using simulation
+#' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
+#' @param data Dataset with columns for response and predictor variable
+#' @param first_in_subtraction Value of predictor that should be first in order of subtraction for computing statistics
+#' @param response_value_numerator Value of response that corresponds to "success" computing proportions
+#' @param number_repetitions number of draws for simulation test
+#' @param as_extreme_as observed statistic
+#' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
+#'
+#' @return Produces mosaic plot of observed proportions and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
+#'
+#' @examples
+#' data(pt)
+#' pt$twoSeconds <- ifelse(pt$responses >=2, "Yes", "No")
+#' two_proportion_test(twoSeconds~brand, data = pt, first_in_subtraction = "B1", response_value_numerator = "Yes", number_repetitions = 100, as_extreme_as = -.4, direction = "two-sided")
+#'
+#' @export
+
+
+two_proportion_test <- function(formula, data, first_in_subtraction,
+                                response_value_numerator,
+                                number_repetitions = 1, as_extreme_as,
+                                direction = c("greater", "less", "two-sided")){
+  if(!(direction %in% c("greater", "less", "two-sided")))
+    stop("Direction must be one of 'greater',  'less', or 'two-sided'")
+  if(number_repetitions < 1 | number_repetitions %% 1 != 0)
+    stop("number of repetitions must be positive and integer valued")
+  resp.name <- all.vars(formula)[1]
+  pred.name <- all.vars(formula)[2]
+  eval(parse(text = paste0("data$", resp.name, " = factor(data$", resp.name, ")")))
+  eval(parse(text = paste0("data$", pred.name, " = factor(data$", pred.name, ")")))
+  response <- eval(parse(text = paste0("data$", resp.name)))
+  predictor <- eval(parse(text = paste0("data$", pred.name)))
+
+  if(!(first_in_subtraction %in% unique(predictor)))
+    stop("First term in order of subtraction must match values in data")
+  if(!(response_value_numerator %in% unique(response)))
+    stop("Value of response in numerator must match values in data")
+
+  row.pcts <- prop.table(table(predictor, response), 1)
+
+  obs.diff <- row.pcts[eval(parse(text = paste0("'", first_in_subtraction, "'"))),
+                       eval(parse(text = paste0("'", response_value_numerator, "'")))] -
+    row.pcts[setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'")))),
+             eval(parse(text = paste0("'", response_value_numerator, "'")))]
+
+
+  sim_diffs <- rep(NA, number_repetitions)
+  for(i in 1:number_repetitions){
+    newResponse <- sample(response)
+    row.pcts <- prop.table(table(predictor, newResponse), 1)
+    sim_diffs[i] <- row.pcts[eval(parse(text = paste0("'", first_in_subtraction, "'"))),
+                             eval(parse(text = paste0("'", response_value_numerator, "'")))] -
+      row.pcts[setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'")))),
+               eval(parse(text = paste0("'", response_value_numerator, "'")))]
+  }
+  par(mfrow = c(1,2), mar = c(4,4,3,0)+0.1, mgp = c(2,.5,0))
+
+  plot(formula, data= data, main = "Observed Data")
+
+  subtraction_order <- paste0("(",eval(parse(text = paste0("'", first_in_subtraction, "'"))), " - ",
+                              setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'")))), ")")
+  legend("topright", legend = c(paste("Obs diff =", round(obs.diff, 3)),
+                                subtraction_order),
+         col = "white", bty = "n")
+
+  count_extreme <- ifelse(direction == "greater", sum(sim_diffs >= as_extreme_as),
+                          ifelse(direction == "less", sum(sim_diffs <= as_extreme_as),
+                                 sum(sim_diffs <= -abs(as_extreme_as)) +
+                                   sum(sim_diffs >= abs(as_extreme_as))))
+
+  h <- hist(sim_diffs, plot = FALSE, breaks = "FD")
+  if(direction == "two-sided"){
+    cuts <- cut(h$breaks, c(-Inf, -abs(as_extreme_as), abs(as_extreme_as), Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[1]] ="red"
+    col.vec[cuts == levels(cuts)[3]] ="red"
+  }else if (direction == "greater"){
+    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[2]] ="red"
+  }else{
+    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[1]] ="red"
+  }
+  plot(h, col = col.vec, main = "", ylab = "", xlab = "Average Difference",
+       sub = paste("Count = ",
+                   count_extreme,
+                   "/", number_repetitions, " = ",
+                   round(count_extreme/number_repetitions,4), sep = ""))
+
+  legend("topright", legend = c(paste("Mean =", round(mean(sim_diffs, na.rm = T),3)),
+                                paste("SD =", round(sd(sim_diffs, na.rm = T),3))),
+         col = "white", bty = "n")
+  if(direction == "two-sided"){
+    abline(v = abs(as_extreme_as), col= "red", lwd = 2)
+    abline(v = -abs(as_extreme_as), col= "red", lwd = 2)
+  }else{
+    abline(v = as_extreme_as, col= "red", lwd = 2)
+  }
+}
+
+
+
+
+
