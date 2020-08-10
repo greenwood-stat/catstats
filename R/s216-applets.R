@@ -537,8 +537,21 @@ two_proportion_test <- function(formula, data, first_in_subtraction,
 }
 
 
-## Difference in means
-
+#' Function to perform hypothesis test for equality of two means using simulation
+#' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
+#' @param data Dataset with columns for response and predictor variable
+#' @param first_in_subtraction Value of predictor that should be first in order of subtraction for computing statistics
+#' @param number_repetitions number of draws for simulation test
+#' @param as_extreme_as observed statistic
+#' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
+#'
+#' @return Produces side-by-side boxplots of observed data and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
+#'
+#' @examples
+#' data(pt)
+#' two_mean_test(responses~brand, data = pt, first_in_subtraction = "B1", number_repetitions = 100, as_extreme_as = -.4, direction = "two-sided")
+#'
+#' @export
 
 two_mean_test <- function(formula, data, first_in_subtraction,
                           direction = c("greater", "less", "two-sided"),
@@ -549,17 +562,16 @@ two_mean_test <- function(formula, data, first_in_subtraction,
     stop("Must enter cutoff value for 'as_extreme_as")
   if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
     stop("number of repetitions must be positive and integer valued")
-  if(!(first_in_subtraction %in% c(unique(data[,1]), unique(data[,2]))))
-    stop("First term in order of subtraction must match values in data")
-  if(ncol(data) != 2)
-    stop("Data should have two variables")
-  n = nrow(data)
 
   resp.name <- all.vars(formula)[1]
   pred.name <- all.vars(formula)[2]
+  eval(parse(text = paste0("data$", pred.name, " = factor(data$", pred.name, ")")))
   response <- eval(parse(text = paste0("data$", resp.name)))
   predictor <- eval(parse(text = paste0("data$", pred.name)))
-  predictor <- factor(predictor)
+  if(!(first_in_subtraction %in% unique(predictor)))
+    stop("First term in order of subtraction must match values in data")
+  n = nrow(data)
+
 
   obs.diff <- mean(response[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))]) -
     mean(response[predictor == setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'"))))])
@@ -620,22 +632,33 @@ two_mean_test <- function(formula, data, first_in_subtraction,
 }
 
 
+#' Function to create bootstrap confidence interval for difference in two means
+#' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
+#' @param data Dataset with columns for response and predictor variable
+#' @param first_in_subtraction Value of predictor that should be first in order of subtraction for computing statistics
+#' @param number_repetitions number of draws for simulation test
+#' @param confidence_level confidence level to use for interval construction in decimal form.  Default is 95%
+#'
+#' @return Produces side-by-side boxplots of observed data and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
+#'
+#' @examples
+#' data(pt)
+#' two_mean_bootstrap_CI(responses~brand, data = pt, first_in_subtraction = "B1", number_repetitions = 100, confidence_level = 0.98)
+#'
+#' @export
 two_mean_bootstrap_CI <- function(formula, data, first_in_subtraction,
                                   confidence_level = 0.95,
                                   number_repetitions = 3){
   if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
     stop("number of repetitions must be positive and integer valued")
-  if(!(first_in_subtraction %in% c(unique(data[,1]), unique(data[,2]))))
-    stop("First term in order of subtraction must match values in data")
-  if(ncol(data) != 2)
-    stop("Data should have two variables")
-  n = nrow(data)
-
   resp.name <- all.vars(formula)[1]
   pred.name <- all.vars(formula)[2]
+  eval(parse(text = paste0("data$", pred.name, " = factor(data$", pred.name, ")")))
   response <- eval(parse(text = paste0("data$", resp.name)))
   predictor <- eval(parse(text = paste0("data$", pred.name)))
-  predictor <- factor(predictor)
+  if(!(first_in_subtraction %in% unique(predictor)))
+    stop("First term in order of subtraction must match values in data")
+  n = nrow(data)
 
   obs.diff <- mean(response[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))]) -
     mean(response[predictor == setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'"))))])
