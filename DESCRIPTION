@@ -10,7 +10,6 @@ Description: Contains a suite of things that are used in instruction at Montana 
 Depends:
     R (>= 3.6.2)
 Imports:
-    alr3,
     car,
     carData,
     corrplot,
@@ -34,6 +33,7 @@ Imports:
     viridis,
     yarrr
 Suggests:
+    alr4,
     coneproj,
     faraway,
     heplots,
