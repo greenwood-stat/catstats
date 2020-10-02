@@ -1,6 +1,6 @@
 # catstats
 
-This is an R package used in the [Introduction to Statistics](https://math.montana.edu/courses/s216/) (STAT 216) and [Intermediate Statistical Concepts](https://math.montana.edu/courses/s217/) (STAT 217) at Montana State University.  Currently, it is only available on GitHub.  
+This is an R package used in our [Introduction to Statistics](https://math.montana.edu/courses/s216/) (STAT 216) and [Intermediate Statistical Concepts](https://math.montana.edu/courses/s217/) (STAT 217) courses at Montana State University.  Currently, it is only available on GitHub.  
 
 This package contains interactive vignettes, code, and data sets to support STAT 216 and STAT 217 at Montana State University and is publicly available for others to use.
 
