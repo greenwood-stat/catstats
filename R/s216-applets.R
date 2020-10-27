@@ -367,7 +367,7 @@ paired_test <- function(data, shift = 0, direction = c("greater", "less", "two-s
 }
 
 
-#' Function to run bootstrap confidence intervalt for matched pairs data
+#' Function to run bootstrap confidence interval for matched pairs data
 #'
 #' @param data vector of differences or a two- or three-column data frame, with values for each group in last two columns
 #' @param number_repetitions number of draws for bootstrap simulation
