@@ -499,15 +499,19 @@ two_proportion_test <- function(formula, data, first_in_subtraction,
       row.pcts[setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'")))),
                eval(parse(text = paste0("'", response_value_numerator, "'")))]
   }
-  par(mfrow = c(1,2), mar = c(4,4,3,0)+0.1, mgp = c(2,.5,0))
+  #par(mfrow = c(1,2), mar = c(4,4,3,0)+0.1, mgp = c(2,.5,0))
 
-  plot(formula, data= data, main = "Observed Data")
+  # plot(formula, data= data, main = "Observed Data")
 
-  subtraction_order <- paste0("(",eval(parse(text = paste0("'", first_in_subtraction, "'"))), " - ",
-                              setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'")))), ")")
-  legend("topright", legend = c(paste("Obs diff =", round(obs.diff, 3)),
-                                subtraction_order),
-         col = "white", bty = "n")
+  # subtraction_order <- paste0("(",eval(parse(text = paste0("'", first_in_subtraction, "'"))),
+  #                             " - ",
+  #                             setdiff(unique(predictor),
+  #                             eval(parse(text = paste0("'", first_in_subtraction, "'")))),
+  #                             ")")
+  # legend("topright",
+  #        legend = c(paste("Obs diff =", round(obs.diff, 3)),
+  #                   subtraction_order),
+  #        col = "white", bty = "n")
 
   count_extreme <- ifelse(direction == "greater", sum(sim_diffs >= as_extreme_as),
                           ifelse(direction == "less", sum(sim_diffs <= as_extreme_as),
@@ -685,16 +689,21 @@ two_mean_test <- function(formula, data, first_in_subtraction,
     sim_diffs[i] <- mean(newResponse[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))]) -
       mean(newResponse[predictor == setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'"))))])
   }
-  par(mfrow = c(1,2), mar = c(4,4,3,0)+0.1, mgp = c(2,.5,0))
+  # par(mfrow = c(1,2), mar = c(4,4,3,0)+0.1, mgp = c(2,.5,0))
+  #
+  # boxplot(formula, data= data, main = "Observed Data")
 
-  boxplot(formula, data= data, main = "Observed Data")
-
-  subtraction_order <- paste0("(",eval(parse(text = paste0("'", first_in_subtraction, "'"))), " - ",
-                              setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'")))), ")")
-  group_max <- tapply(response, predictor, quantile, 0.8)
-  legend(ifelse(group_max[1] > group_max[2], "topright", "topleft"), legend = c(paste("Obs diff =", round(obs.diff, 3)),
-                                subtraction_order),
-         col = "white", bty = "n")
+  # subtraction_order <- paste0("(",
+  #           eval(parse(text = paste0("'",first_in_subtraction, "'"))),
+  #           " - ",
+  #           setdiff(unique(predictor),
+  #           eval(parse(text = paste0("'", first_in_subtraction, "'")))),
+  #           ")")
+  # group_max <- tapply(response, predictor, quantile, 0.8)
+  # legend(ifelse(group_max[1] > group_max[2], "topright", "topleft"),
+  #        legend = c(paste("Obs diff =", round(obs.diff, 3)),
+  #                               subtraction_order),
+  #        col = "white", bty = "n")
 
   count_extreme <- ifelse(direction == "greater", sum(sim_diffs >= as_extreme_as),
                           ifelse(direction == "less", sum(sim_diffs <= as_extreme_as),
@@ -863,16 +872,19 @@ regression_test <- function(formula, data,  statistic = c("slope", "correlation"
     sim_vals <- sim_vals/sdRatio
     obs.stat <- obs.stat/sdRatio
   }
-  par(mfrow = c(1,2), mar = c(4,4,3,0)+0.1, mgp = c(2,.5,0))
+  # par(mfrow = c(1,2), mar = c(4,4,3,0)+0.1, mgp = c(2,.5,0))
+  #
+  # plot(formula, data= data, main = "Observed Data", pch = 15)
+  # abline(obs.fit$coef, col = "red", lwd = 2)
+  #
+  # legend("topleft",
+  #        legend = c(paste("Obs", statistic, "=", round(obs.stat, 3))),
+  #        col = "white", bty = "n", cex = 0.75)
 
-  plot(formula, data= data, main = "Observed Data", pch = 15)
-  abline(obs.fit$coef, col = "red", lwd = 2)
-
-  legend("topleft", legend = c(paste("Obs", statistic, "=", round(obs.stat, 3))),
-         col = "white", bty = "n", cex = 0.75)
-
-  count_extreme <- ifelse(direction == "greater", sum(sim_vals >= as_extreme_as),
-                          ifelse(direction == "less", sum(sim_vals <= as_extreme_as),
+  count_extreme <- ifelse(direction == "greater",
+                          sum(sim_vals >= as_extreme_as),
+                          ifelse(direction == "less",
+                                 sum(sim_vals <= as_extreme_as),
                                  sum(sim_vals <= -abs(as_extreme_as)) +
                                    sum(sim_vals >= abs(as_extreme_as))))
 
