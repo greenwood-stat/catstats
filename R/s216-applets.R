@@ -324,11 +324,11 @@ paired_observed_plot <- function(data){
 
   leg.loc = min(data) + 0.85*(max(data)-min(data))
   legend(leg.loc,5.5, col = "white", bty = "n",
-         legend = c(dimnames(data)[[2]][1], paste("Mean =", round(mean(data[,1],na.rm = T), 3)),
+         legend = c(dimnames(data)[[2]][2], paste("Mean =", round(mean(data[,1],na.rm = T), 3)),
                     paste("SD =", round(sd(data[,1], na.rm = T), 3))),
          text.col = "red", cex = 0.75)
   legend(leg.loc,2.5 , col = "white", bty = "n",
-         legend = c(dimnames(data)[[2]][2], paste("Mean =", round(mean(data[,2],na.rm = T), 3)),
+         legend = c(dimnames(data)[[2]][1], paste("Mean =", round(mean(data[,2],na.rm = T), 3)),
                     paste("SD =", round(sd(data[,2], na.rm = T), 3))),
          text.col = "blue", cex = 0.75)
 
