@@ -270,7 +270,7 @@ one_proportion_bootstrap_CI <- function(sample_size, number_successes,
        xlab = "Bootstrapped values of the proportion",
        ylab = "",
        yaxt = "n",
-       sub = paste0(100*confidence_level, "% CI: (",
+       sub = paste0("Mean: ", mean(sim_props), ", SD: ", sd(sim_props), ", ", 100*confidence_level, "% CI: (",
                     round(low_ci, 3), ", ", round(high_ci,3), ")"))
   for(i in 1:length(success_tab)){
     lines(rep(as.numeric(names(success_tab)[i]),2), c(0, success_tab[i]), lwd = 5,
@@ -284,6 +284,7 @@ one_proportion_bootstrap_CI <- function(sample_size, number_successes,
   text(c(low_ci, high_ci),
        rep(max(success_tab)+3,2), labels = cutoff_label,
        pos = c(2, 4), cex = .75)
+
 }
 
 
