@@ -721,7 +721,7 @@ two_proportion_bootstrap_CI <- function(formula, data, first_in_subtraction,
                                                         max(max(h$breaks), high_ci+break_range/6)),
        xlab = "Bootstrap Difference in Proportions",
        sub = paste0("Mean: ", round(mean(sim_diffs),3),
-                    "SD: ", round(sd(sim_diffs,3), "\n",
+                    "SD: ", round(sd(sim_diffs),3), "\n",
                     100*confidence_level, "% CI: (",
                     round(low_ci,3), ", ", round(high_ci,3), ")"))
   abline(v = c(low_ci, high_ci), col= "red", lwd = 2)
