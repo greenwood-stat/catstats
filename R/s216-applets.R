@@ -317,16 +317,16 @@ paired_observed_plot <- function(data, first = 1){
 
   rg <- max(data) - min(data)
   par(mfrow = c(2,1), mgp = c(2, .5, 0), mar = c(4,4,0,0)+.1)
-  plot(0, 0, "n", xlim = c(min(data), max(data)+0.1*rg),
+  plot(0, 0, "n", xlim = c(min(data), max(data)+0.3*rg),
        ylim = c(0, 5.5), yaxt = "n", xlab = "Outcomes",
        ylab = "")
+  for(i in 1:nrow(data)){
+    lines(c(data[i,]), c(3, 0.5), col = "grey80")
+  }
   points(data[,1], rep(3, nrow(data)), pch = 15, col = "blue")
   points(data[,2], rep(0.5, nrow(data)), pch = 15, col = "red")
-  for(i in 1:nrow(data)){
-    lines(c(data[i,]), c(3, 0.5))
-  }
 
-  leg.loc = min(data) + 0.85*(max(data)-min(data))
+  leg.loc = min(data) + 0.95*(max(data)-min(data))
   legend(leg.loc, 5.5, col = "white", bty = "n",
          legend = c(dimnames(data)[[2]][1],
                     paste("Mean =", round(mean(data[,1],na.rm = T), 3)),
