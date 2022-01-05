@@ -4,10 +4,12 @@
 \alias{paired_observed_plot}
 \title{Function to produce plot of observed matched pairs data}
 \usage{
-paired_observed_plot(data)
+paired_observed_plot(data, first = 1)
 }
 \arguments{
 \item{data}{two- or three-column data frame, with values for each group in last two columns}
+
+\item{first}{1 if subtracting second column from first; 2 if subtracting first column from second (default is 1)}
 }
 \value{
 Produces plot of distribution of observed values, with means & SDs in groups and paired observations linked by a line segment

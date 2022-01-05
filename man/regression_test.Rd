@@ -7,22 +7,22 @@
 regression_test(
   formula,
   data,
-  statistic = c("slope", "correlation"),
+  summary_measure = c("slope", "correlation"),
   direction = c("greater", "less", "two-sided"),
   as_extreme_as,
   number_repetitions = 3
 )
 }
 \arguments{
-\item{formula}{Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical}
+\item{formula}{formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical}
 
-\item{data}{Dataset with columns for response and predictor variable}
+\item{data}{dataset with columns for response and predictor variable}
 
-\item{statistic}{"slope" for test of slope or "correlation" for test of correlation}
+\item{summary_measure}{"slope" for test of slope or "correlation" for test of correlation}
 
 \item{direction}{one of "greater", "less", or "two-sided" to give direction of hypothsis test}
 
-\item{as_extreme_as}{observed statistic}
+\item{as_extreme_as}{value of observed statistic.}
 
 \item{number_repetitions}{number of draws for simulation test}
 }
@@ -33,6 +33,6 @@ Function to perform simulation-based test for slope of simple linear regression 
 data(mtfires)
 mtfires$logHect  <- log(mtfires$Hectares)
 regression_test(logHect~Temperature, data = mtfires,
-         direction = "greater", statistic = "correlation",
+         direction = "greater", summary_measure = "correlation",
          as_extreme_as = 1.388, number_repetitions = 1000)
 }

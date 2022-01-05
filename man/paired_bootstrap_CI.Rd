@@ -2,7 +2,7 @@
 % Please edit documentation in R/s216-applets.R
 \name{paired_bootstrap_CI}
 \alias{paired_bootstrap_CI}
-\title{Function to run bootstrap confidence intervalt for matched pairs data}
+\title{Function to run bootstrap confidence interval for matched pairs data}
 \usage{
 paired_bootstrap_CI(
   data,
@@ -24,7 +24,7 @@ paired_bootstrap_CI(
 Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
 }
 \description{
-Function to run bootstrap confidence intervalt for matched pairs data
+Function to run bootstrap confidence interval for matched pairs data
 }
 \examples{
 set.seed(117)

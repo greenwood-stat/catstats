@@ -8,31 +8,47 @@ one_proportion_test(
   probability_success = 0.5,
   sample_size = 5,
   number_repetitions = 1,
+  summary_measure = c("number", "proportion"),
   as_extreme_as,
-  direction = c("greater", "less", "two-sided"),
-  report_value = c("number", "proportion")
+  direction = c("greater", "less", "two-sided")
 )
 }
 \arguments{
-\item{probability_success}{value between 0 and 1, represents null hypothesis value for proportion}
+\item{probability_success}{value between 0 and 1
+representing the null hypothesis value for proportion.}
 
-\item{sample_size}{number of trials used to compute proportion}
+\item{sample_size}{number of trials used to compute proportion.}
 
-\item{number_repetitions}{number of draws for simulation test}
+\item{number_repetitions}{number of draws for simulation test.}
 
-\item{as_extreme_as}{observed statistic (between 0 and 1)}
+\item{summary_measure}{value to return from simulations.
+Allowed values are
+\code{"number"} for number of successes or
+\code{"proportion"} for proportion of successes.}
 
-\item{direction}{one of "greater", "less", or "two-sided" to give direction of hypothsis test}
+\item{as_extreme_as}{value of observed statistic.
+Between 0 and 1 if \code{summary_measure} is \code{"proportion"};
+an integer between 1 and \code{sample_size} if \code{summary_measure} is \code{"number"}.}
 
-\item{report_value}{value to return from simulations - "number" for number of successes or "proportion" for proportion of successes}
+\item{direction}{direction of alternative hypothesis.
+Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 }
 \value{
-Plot of distribution of simulated values, with values as or more extreme than specified value highlighted and reports proportion of successes in simulations as subtitle on plot
+Plot of distribution of simulated values,
+with values as or more extreme than specified
+value highlighted and reports
+proportion of successes in simulations
+as subtitle on plot.
 }
 \description{
-This function will run a simulation-based hypothesis test for the value of a single proportion.
+This function will run a simulation-based hypothesis test
+for the value of a single proportion.
 }
 \examples{
-one_proportion_test(probability_success = 0.5, sample_size = 150, number_repetitions = 100,
-          as_extreme_as = 0.65, direction = "greater", report_value = "proportion")
+one_proportion_test(probability_success = 0.5,
+  sample_size = 150,
+  number_repetitions = 100,
+  as_extreme_as = 0.65,
+  direction = "greater",
+  summary_measure = "proportion")
 }

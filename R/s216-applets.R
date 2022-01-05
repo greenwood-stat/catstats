@@ -1,25 +1,42 @@
 #' One proportion simulation-based hypothesis test
 #'
-#' This function will run a simulation-based hypothesis test for the value of a single proportion.
-#' @param probability_success value between 0 and 1, represents null hypothesis value for proportion
-#' @param sample_size number of trials used to compute proportion
-#' @param number_repetitions number of draws for simulation test
-#' @param as_extreme_as observed statistic (between 0 and 1)
-#' @param direction one of "greater", "less", or "two-sided" to give direction of hypothesis test
-#' @param report_value value to return from simulations - "number" for number of successes or "proportion" for proportion of successes
-#' @return Plot of distribution of simulated values, with values as or more extreme than specified value highlighted and reports proportion of successes in simulations as subtitle on plot
+#' This function will run a simulation-based hypothesis test
+#' for the value of a single proportion.
+#'
+#' @param probability_success value between 0 and 1
+#'    representing the null hypothesis value for proportion.
+#' @param sample_size number of trials used to compute proportion.
+#' @param number_repetitions number of draws for simulation test.
+#' @param summary_measure value to return from simulations.
+#'    Allowed values are
+#'    `"number"` for number of successes or
+#'    `"proportion"` for proportion of successes.
+#' @param as_extreme_as value of observed statistic.
+#'    Between 0 and 1 if `summary_measure` is `"proportion"`;
+#'    an integer between 1 and `sample_size` if `summary_measure` is `"number"`.
+#' @param direction direction of alternative hypothesis.
+#'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
+#' @return Plot of distribution of simulated values,
+#'    with values as or more extreme than specified
+#'    value highlighted and reports
+#'    proportion of successes in simulations
+#'    as subtitle on plot.
 #' @examples
-#' one_proportion_test(probability_success = 0.5, sample_size = 150, number_repetitions = 100,
-#'           as_extreme_as = 0.65, direction = "greater", report_value = "proportion")
+#' one_proportion_test(probability_success = 0.5,
+#'   sample_size = 150,
+#'   number_repetitions = 100,
+#'   as_extreme_as = 0.65,
+#'   direction = "greater",
+#'   summary_measure = "proportion")
 #' @export
 
 
 one_proportion_test <- function(probability_success = 0.5,
                                 sample_size = 5,
                                 number_repetitions = 1,
+                                summary_measure = c("number", "proportion"),
                                 as_extreme_as,
-                                direction = c("greater", "less", "two-sided"),
-                                report_value = c("number", "proportion")){
+                                direction = c("greater", "less", "two-sided")){
   if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
     stop("number of repetitions must be positive and integer valued")
   if(sample_size < 1 | !(sample_size %%1 == 0))
@@ -28,8 +45,8 @@ one_proportion_test <- function(probability_success = 0.5,
     stop("Probability of success must be between zero and one")
   if(!(direction %in% c("greater", "less", "two-sided")))
     stop("Direction must be one of 'greater',  'less', or 'two-sided'")
-  if(!(report_value %in% c("number", "proportion")))
-    stop("Value to report must be either 'number' or 'proportion' of successes")
+  if(!(summary_measure %in% c("number", "proportion")))
+    stop("Summary measure to report must be either 'number' or 'proportion' of successes")
   if(is.null(as_extreme_as))
     stop("Must enter cutoff value for 'as_extreme_as")
 
@@ -47,7 +64,7 @@ one_proportion_test <- function(probability_success = 0.5,
   # Not two-sided:
   if(!(direction == "two-sided")){
     # Calculate p-value
-    if(report_value == "number"){
+    if(summary_measure == "number"){
       proportion_extreme <- ifelse(direction == "greater",
                                    mean(number_heads >= as_extreme_as),
                                    mean(number_heads <= as_extreme_as))
@@ -58,7 +75,7 @@ one_proportion_test <- function(probability_success = 0.5,
     }
 
     # Plot
-    if(report_value == "number"){ # Number of successes; not two-sided
+    if(summary_measure == "number"){ # Number of successes; not two-sided
       plot(0,0, "n",frame.plot = FALSE,
            xlim = c(min(min(number_heads),
                         as_extreme_as-range_heads/5),
@@ -140,7 +157,7 @@ one_proportion_test <- function(probability_success = 0.5,
                   round(sd(number_heads/sample_size, na.rm = T),3)),
             line = -3, side = 4, las = 2)
     }
-  }else if(report_value == "number"){ # Number of successes; two-sided
+  }else if(summary_measure == "number"){ # Number of successes; two-sided
     if(as_extreme_as > probability_success*sample_size){
       upper = as_extreme_as
       lower = max(0, 2*probability_success*sample_size-as_extreme_as)
@@ -359,7 +376,7 @@ paired_observed_plot <- function(data, first = 1){
 #' @param data vector of differences or a two- or three-column data frame, with values for each group in last two columns
 #' @param shift amount to shift differences for bootstrapping of null distribution
 #' @param number_repetitions number of draws for simulation test
-#' @param as_extreme_as observed statistic
+#' @param as_extreme_as value of observed statistic.
 #' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
 #' @param which_first For order of subtraction - which column should be first?
 #'
@@ -539,7 +556,7 @@ paired_bootstrap_CI <- function(data, number_repetitions = 100, confidence_level
 #' @param first_in_subtraction Value of predictor that should be first in order of subtraction for computing statistics
 #' @param response_value_numerator Value of response that corresponds to "success" computing proportions
 #' @param number_repetitions number of draws for simulation test
-#' @param as_extreme_as observed statistic
+#' @param as_extreme_as value of observed statistic.
 #' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
 #'
 #' @return Produces mosaic plot of observed proportions and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
@@ -747,7 +764,7 @@ two_proportion_bootstrap_CI <- function(formula, data, first_in_subtraction,
 #' @param data Dataset with columns for response and predictor variable
 #' @param first_in_subtraction Value of predictor that should be first in order of subtraction for computing statistics
 #' @param number_repetitions number of draws for simulation test
-#' @param as_extreme_as observed statistic
+#' @param as_extreme_as value of observed statistic.
 #' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
 #'
 #' @return Produces side-by-side boxplots of observed data and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
@@ -935,10 +952,10 @@ two_mean_bootstrap_CI <- function(formula, data, first_in_subtraction,
 #'
 #' Function to perform simulation-based test for slope of simple linear regression or correlation between two quantitative variables
 #'
-#' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
-#' @param data Dataset with columns for response and predictor variable
-#' @param statistic "slope" for test of slope or "correlation" for test of correlation
-#' @param as_extreme_as observed statistic
+#' @param formula formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
+#' @param data dataset with columns for response and predictor variable
+#' @param summary_measure "slope" for test of slope or "correlation" for test of correlation
+#' @param as_extreme_as value of observed statistic.
 #' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
 #' @param number_repetitions number of draws for simulation test
 #'
@@ -946,15 +963,15 @@ two_mean_bootstrap_CI <- function(formula, data, first_in_subtraction,
 #' data(mtfires)
 #' mtfires$logHect  <- log(mtfires$Hectares)
 #' regression_test(logHect~Temperature, data = mtfires,
-#'          direction = "greater", statistic = "correlation",
+#'          direction = "greater", summary_measure = "correlation",
 #'          as_extreme_as = 1.388, number_repetitions = 1000)
 #' @export
 
-regression_test <- function(formula, data,  statistic = c("slope", "correlation"),
+regression_test <- function(formula, data,  summary_measure = c("slope", "correlation"),
                             direction = c("greater", "less", "two-sided"),
                             as_extreme_as, number_repetitions = 3){
-  if(!(statistic %in% c("slope", "correlation")))
-    stop("Statistic must be either slope or correlation")
+  if(!(summary_measure %in% c("slope", "correlation")))
+    stop("Summary measure must be either slope or correlation")
   if(!(direction %in% c("greater", "less", "two-sided")))
     stop("direction must be 'greater', 'less', or 'two-sided'")
   if(is.null(as_extreme_as))
@@ -979,7 +996,7 @@ regression_test <- function(formula, data,  statistic = c("slope", "correlation"
     sim_vals[i] <- sim.fit$coef[2]
   }
 
-  if(statistic == "correlation"){
+  if(summary_measure == "correlation"){
     sdRatio <- sd(response)/sd(predictor)
     sim_vals <- sim_vals/sdRatio
     obs.stat <- obs.stat/sdRatio
@@ -990,7 +1007,7 @@ regression_test <- function(formula, data,  statistic = c("slope", "correlation"
   # abline(obs.fit$coef, col = "red", lwd = 2)
   #
   # legend("topleft",
-  #        legend = c(paste("Obs", statistic, "=", round(obs.stat, 3))),
+  #        legend = c(paste("Obs", summary_measure, "=", round(obs.stat, 3))),
   #        col = "white", bty = "n", cex = 0.75)
 
   count_extreme <- ifelse(direction == "greater",
@@ -1019,7 +1036,7 @@ regression_test <- function(formula, data,  statistic = c("slope", "correlation"
   plot(h, col = col.vec, main = "",
        ylab = "",
        yaxt = "n",
-       xlab = statistic,
+       xlab = summary_measure,
        xlim = c(min(min(sim_vals),
                     ifelse(direction == "two-sided",
                     -abs(as_extreme_as)-range_diffs/5,
@@ -1051,22 +1068,22 @@ regression_test <- function(formula, data,  statistic = c("slope", "correlation"
 #'
 #' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
 #' @param data Dataset with columns for response and predictor variable
-#' @param statistic "slope" for test of slope or "correlation" for test of correlation
+#' @param summary_measure "slope" for test of slope or "correlation" for test of correlation
 #' @param confidence_level confidence level to use for interval in decimal form.  Default is for 95% CI
 #' @param number_repetitions number of draws for bootstrap simulation
 #'
 #' @examples
 #' data(mtfires)
 #' mtfires$logHect  <- log(mtfires$Hectares)
-#' regression_bootstrap_CI(logHect~Temperature, data = mtfires, statistic = "correlation",
+#' regression_bootstrap_CI(logHect~Temperature, data = mtfires, summary_measure = "correlation",
 #'              confidence_level = 0.9, number_repetitions = 1000)
 #' @export
 
 regression_bootstrap_CI <- function(formula, data, confidence_level = 0.95,
-                                    statistic = c("slope", "correlation"),
+                                    summary_measure = c("slope", "correlation"),
                                     number_repetitions = 3){
-  if(!(statistic %in% c("slope", "correlation")))
-    stop("Statistic must be either slope or correlation")
+  if(!(summary_measure %in% c("slope", "correlation")))
+    stop("Summary measure must be either slope or correlation")
   if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
     stop("number of repetitions must be positive and integer valued")
   if(confidence_level < 0 | confidence_level > 1)
@@ -1088,7 +1105,7 @@ regression_bootstrap_CI <- function(formula, data, confidence_level = 0.95,
     sim_vals[i] <- sim.fit$coef[2]
   }
 
-  if(statistic == "correlation"){
+  if(summary_measure == "correlation"){
     sdRatio <- sd(response)/sd(predictor)
     sim_vals <- sim_vals/sdRatio
   }
@@ -1109,7 +1126,7 @@ regression_bootstrap_CI <- function(formula, data, confidence_level = 0.95,
        yaxt = "n",
        xlim = c(min(min(h$breaks), low_ci-break_range/6),
                 max(max(h$breaks), high_ci+break_range/6)),
-       xlab = paste("Bootstrap", statistic),
+       xlab = paste("Bootstrap", summary_measure),
        sub = paste0(100*confidence_level, "% CI: (",
              round(low_ci,3), ", ", round(high_ci,3), ")"))
   abline(v = c(low_ci, high_ci), col= "red", lwd = 2)

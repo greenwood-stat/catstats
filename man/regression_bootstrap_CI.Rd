@@ -8,7 +8,7 @@ regression_bootstrap_CI(
   formula,
   data,
   confidence_level = 0.95,
-  statistic = c("slope", "correlation"),
+  summary_measure = c("slope", "correlation"),
   number_repetitions = 3
 )
 }
@@ -19,7 +19,7 @@ regression_bootstrap_CI(
 
 \item{confidence_level}{confidence level to use for interval in decimal form.  Default is for 95\% CI}
 
-\item{statistic}{"slope" for test of slope or "correlation" for test of correlation}
+\item{summary_measure}{"slope" for test of slope or "correlation" for test of correlation}
 
 \item{number_repetitions}{number of draws for bootstrap simulation}
 }
@@ -29,6 +29,6 @@ Function to create bootstrap confidence interval for slope of simple linear regr
 \examples{
 data(mtfires)
 mtfires$logHect  <- log(mtfires$Hectares)
-regression_bootstrap_CI(logHect~Temperature, data = mtfires, statistic = "correlation",
+regression_bootstrap_CI(logHect~Temperature, data = mtfires, summary_measure = "correlation",
              confidence_level = 0.9, number_repetitions = 1000)
 }

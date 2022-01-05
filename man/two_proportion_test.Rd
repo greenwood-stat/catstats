@@ -25,7 +25,7 @@ two_proportion_test(
 
 \item{number_repetitions}{number of draws for simulation test}
 
-\item{as_extreme_as}{observed statistic}
+\item{as_extreme_as}{value of observed statistic.}
 
 \item{direction}{one of "greater", "less", or "two-sided" to give direction of hypothsis test}
 }

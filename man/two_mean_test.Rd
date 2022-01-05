@@ -22,7 +22,7 @@ two_mean_test(
 
 \item{direction}{one of "greater", "less", or "two-sided" to give direction of hypothsis test}
 
-\item{as_extreme_as}{observed statistic}
+\item{as_extreme_as}{value of observed statistic.}
 
 \item{number_repetitions}{number of draws for simulation test}
 }
