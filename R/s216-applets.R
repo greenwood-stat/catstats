@@ -5,7 +5,7 @@
 #' @param sample_size number of trials used to compute proportion
 #' @param number_repetitions number of draws for simulation test
 #' @param as_extreme_as observed statistic (between 0 and 1)
-#' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
+#' @param direction one of "greater", "less", or "two-sided" to give direction of hypothesis test
 #' @param report_value value to return from simulations - "number" for number of successes or "proportion" for proportion of successes
 #' @return Plot of distribution of simulated values, with values as or more extreme than specified value highlighted and reports proportion of successes in simulations as subtitle on plot
 #' @examples
@@ -293,6 +293,7 @@ one_proportion_bootstrap_CI <- function(sample_size, number_successes,
 #' Function to produce plot of observed matched pairs data
 #'
 #' @param data two- or three-column data frame, with values for each group in last two columns
+#' @param first 1 if subtracting second column from first; 2 if subtracting first column from second (default is 1)
 #'
 #' @return Produces plot of distribution of observed values, with means & SDs in groups and paired observations linked by a line segment
 #'
@@ -304,43 +305,51 @@ one_proportion_bootstrap_CI <- function(sample_size, number_successes,
 #' paired_observed_plot(data)
 #' @export
 
-
-
-
-paired_observed_plot <- function(data){
+paired_observed_plot <- function(data, first = 1){
   if(ncol(data) < 2 | ncol(data) > 3)
-    stop("Data should have two or three variables")
+    stop("Data should have two or three columns")
   if(ncol(data) == 3)
     data <- data[,2:3]
 
-  differences = data[,1]-data[,2]
+  differences <- data[,1]-data[,2]
+  if(first == 2)
+    differences <- data[,2]-data[,1]
+
+  rg <- max(data) - min(data)
   par(mfrow = c(2,1), mgp = c(2, .5, 0), mar = c(4,4,0,0)+.1)
-  plot(0,0, "n", xlim = c(min(data), max(data)),
-       ylim = c(0,5.5), yaxt = "n", xlab = "Outcomes",
+  plot(0, 0, "n", xlim = c((min(data)-0.2*rg), max(data)),
+       ylim = c(0, 5.5), yaxt = "n", xlab = "Outcomes",
        ylab = "")
-  points(data[,1], rep(0.5, nrow(data)), pch = 15, col = "blue")
-  points(data[,2],rep(3, nrow(data)), pch = 15, col = "red")
+  points(data[,1], rep(3, nrow(data)), pch = 15, col = "blue")
+  points(data[,2], rep(0.5, nrow(data)), pch = 15, col = "red")
   for(i in 1:nrow(data)){
-    lines(c(data[i,]), c(.5, 3))
+    lines(c(data[i,]), c(3, 0.5))
   }
 
   leg.loc = min(data) + 0.85*(max(data)-min(data))
-  legend(leg.loc,5.5, col = "white", bty = "n",
-         legend = c(dimnames(data)[[2]][2], paste("Mean =", round(mean(data[,1],na.rm = T), 3)),
+  legend(leg.loc, 5.5, col = "white", bty = "n",
+         legend = c(dimnames(data)[[2]][1],
+                    paste("Mean =", round(mean(data[,1],na.rm = T), 3)),
                     paste("SD =", round(sd(data[,1], na.rm = T), 3))),
-         text.col = "red", cex = 0.75)
-  legend(leg.loc,2.5 , col = "white", bty = "n",
-         legend = c(dimnames(data)[[2]][1], paste("Mean =", round(mean(data[,2],na.rm = T), 3)),
-                    paste("SD =", round(sd(data[,2], na.rm = T), 3))),
          text.col = "blue", cex = 0.75)
+  legend(leg.loc, 2.5, col = "white", bty = "n",
+         y.intersp = 0.8, inset = c(-0.08,0),
+         legend = c(dimnames(data)[[2]][2],
+                    paste("Mean =", round(mean(data[,2],na.rm = T), 3)),
+                    paste("SD =", round(sd(data[,2], na.rm = T), 3))),
+         text.col = "red", cex = 0.75)
 
-
-
-  hist(differences, xlab = "Observed differences",
-       ylab = "", col = "grey80",
-       main = "", breaks = round(nrow(data)/3))
-  legend("topright", legend = c(paste("Mean =", round(mean(differences, na.rm = T),3)),
-                                paste("SD =", round(sd(differences, na.rm = T),3))),
+  freqs <- hist(differences, breaks = round(nrow(data)/3), plot=FALSE)$counts
+  hist(differences, xlab = paste("Observed differences (",
+                                 dimnames(data)[[2]][1],"-",
+                                 dimnames(data)[[2]][2],")"),
+       ylab = "Frequency", col = "grey80",
+       main = "", breaks = round(nrow(data)/3),
+       ylim = c(0, 1.2*max(freqs)))
+  legend("topleft", y.intersp=0.8, cex = 0.8, inset = c(-0.08,0),
+         legend =
+           c(paste("Mean =", round(mean(differences, na.rm = T),3)),
+             paste("SD =", round(sd(differences, na.rm = T),3))),
          col = "white", bty = "n")
 }
 
