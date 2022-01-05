@@ -317,7 +317,7 @@ paired_observed_plot <- function(data, first = 1){
 
   rg <- max(data) - min(data)
   par(mfrow = c(2,1), mgp = c(2, .5, 0), mar = c(4,4,0,0)+.1)
-  plot(0, 0, "n", xlim = c((min(data)-0.2*rg), max(data)),
+  plot(0, 0, "n", xlim = c(min(data), max(data)+0.1*rg),
        ylim = c(0, 5.5), yaxt = "n", xlab = "Outcomes",
        ylab = "")
   points(data[,1], rep(3, nrow(data)), pch = 15, col = "blue")
@@ -333,7 +333,6 @@ paired_observed_plot <- function(data, first = 1){
                     paste("SD =", round(sd(data[,1], na.rm = T), 3))),
          text.col = "blue", cex = 0.75)
   legend(leg.loc, 2.5, col = "white", bty = "n",
-         y.intersp = 0.8, inset = c(-0.08,0),
          legend = c(dimnames(data)[[2]][2],
                     paste("Mean =", round(mean(data[,2],na.rm = T), 3)),
                     paste("SD =", round(sd(data[,2], na.rm = T), 3))),
@@ -346,7 +345,7 @@ paired_observed_plot <- function(data, first = 1){
        ylab = "Frequency", col = "grey80",
        main = "", breaks = round(nrow(data)/3),
        ylim = c(0, 1.2*max(freqs)))
-  legend("topleft", y.intersp=0.8, cex = 0.8, inset = c(-0.08,0),
+  legend("topleft", cex = 0.8,
          legend =
            c(paste("Mean =", round(mean(differences, na.rm = T),3)),
              paste("SD =", round(sd(differences, na.rm = T),3))),
