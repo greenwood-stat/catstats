@@ -2,39 +2,47 @@
 % Please edit documentation in R/s216-applets.R
 \name{two_mean_test}
 \alias{two_mean_test}
-\title{Function to perform hypothesis test for equality of two means using simulation}
+\title{Simulation-based hypothesis test for a difference in means}
 \usage{
 two_mean_test(
   formula,
   data,
   first_in_subtraction,
-  direction = c("greater", "less", "two-sided"),
   as_extreme_as,
-  number_repetitions = 3
+  direction = c("greater", "less", "two-sided"),
+  number_repetitions = 1
 )
 }
 \arguments{
-\item{formula}{Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical}
+\item{formula}{Formula of the form \code{response ~ predictor},
+where \code{predictor} defines the two groups of the explanatory variable and
+\code{response} is a quantitative response variable.}
 
-\item{data}{Dataset with columns for response and predictor variable}
+\item{data}{Data frame with columns for response and predictor variables.}
 
-\item{first_in_subtraction}{Value of predictor that should be first in order of subtraction for computing statistics}
+\item{first_in_subtraction}{Value of predictor variable
+that should be first in order of subtraction for computing
+difference in means.}
 
-\item{direction}{one of "greater", "less", or "two-sided" to give direction of hypothsis test}
+\item{as_extreme_as}{Value of observed difference in means.}
 
-\item{as_extreme_as}{value of observed statistic.}
+\item{direction}{Direction of alternative hypothesis.
+Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 
-\item{number_repetitions}{number of draws for simulation test}
+\item{number_repetitions}{Number of simulated samples.}
 }
 \value{
 Produces side-by-side boxplots of observed data and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
 }
 \description{
-Function to perform hypothesis test for equality of two means using simulation
+Simulation-based hypothesis test for a difference in means
 }
 \examples{
 data(pt)
-two_mean_test(responses~brand, data = pt, first_in_subtraction = "B1",
-          number_repetitions = 100, as_extreme_as = -.4, direction = "two-sided")
-
+two_mean_test(responses ~ brand,
+  data = pt,
+  first_in_subtraction = "B1",
+  as_extreme_as = -.4,
+  direction = "two-sided",
+  number_repetitions = 1000)
 }

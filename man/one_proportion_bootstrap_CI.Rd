@@ -2,31 +2,34 @@
 % Please edit documentation in R/s216-applets.R
 \name{one_proportion_bootstrap_CI}
 \alias{one_proportion_bootstrap_CI}
-\title{Function to produce bootstrap confidence interval for one proportion}
+\title{Bootstrap confidence interval for one proportion}
 \usage{
 one_proportion_bootstrap_CI(
   sample_size,
   number_successes,
-  number_repetitions = 100,
-  confidence_level = 0.95
+  confidence_level = 0.95,
+  number_repetitions = 100
 )
 }
 \arguments{
-\item{sample_size}{number of trials used to compute proportion}
+\item{sample_size}{Number of trials used to compute proportion.}
 
-\item{number_successes}{how many successes were observed in those trials?}
+\item{number_successes}{How many successes were observed in those trials?}
 
-\item{number_repetitions}{number of draws for simulation test}
+\item{confidence_level}{Confidence level for interval in decimal form.
+Defaults to 0.95 (95\% confidence interval).}
 
-\item{confidence_level}{confidence level for interval in decimal form.  Defaults to 95\%}
+\item{number_repetitions}{Number of bootstrapped resamples.}
 }
 \value{
 Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
 }
 \description{
-Function to produce bootstrap confidence interval for one proportion
+Bootstrap confidence interval for one proportion
 }
 \examples{
-one_proportion_bootstrap_CI(sample_size = 150, number_successes = 98, number_repetitions = 100,
-                      confidence_level = 0.99)
+one_proportion_bootstrap_CI(sample_size = 150,
+   number_successes = 98,
+   confidence_level = 0.99,
+   number_repetitions = 1000)
 }

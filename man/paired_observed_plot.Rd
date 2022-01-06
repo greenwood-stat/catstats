@@ -2,25 +2,28 @@
 % Please edit documentation in R/s216-applets.R
 \name{paired_observed_plot}
 \alias{paired_observed_plot}
-\title{Function to produce plot of observed matched pairs data}
+\title{Plots for observed matched pairs data}
 \usage{
-paired_observed_plot(data, first = 1)
+paired_observed_plot(data, which_first = 1)
 }
 \arguments{
-\item{data}{two- or three-column data frame, with values for each group in last two columns}
+\item{data}{Two- or three-column data frame
+with values for each group in last two columns.}
 
-\item{first}{1 if subtracting second column from first; 2 if subtracting first column from second (default is 1)}
+\item{which_first}{Which column is first in order of subtraction?
+\code{1} if subtracting second column from first (1 - 2);
+\code{2} if subtracting first column from second (2 - 1). Defaults to \code{1}.}
 }
 \value{
 Produces plot of distribution of observed values, with means & SDs in groups and paired observations linked by a line segment
 }
 \description{
-Function to produce plot of observed matched pairs data
+Plots for observed matched pairs data
 }
 \examples{
 set.seed(117)
 x <- rnorm(25)
 y <- x + 1 + rnorm(25, 0, 1.8)
-data <- data.frame(x,y)
-paired_observed_plot(data)
+data <- data.frame(x, y)
+paired_observed_plot(data, which_first = 1)
 }

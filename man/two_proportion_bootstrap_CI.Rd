@@ -2,40 +2,49 @@
 % Please edit documentation in R/s216-applets.R
 \name{two_proportion_bootstrap_CI}
 \alias{two_proportion_bootstrap_CI}
-\title{Function to build bootstrap confidence interval for the difference between two proportions}
+\title{Bootstrap confidence interval for a difference in proportions}
 \usage{
 two_proportion_bootstrap_CI(
   formula,
   data,
   first_in_subtraction,
   response_value_numerator,
-  number_repetitions = 1,
-  confidence_level = 0.95
+  confidence_level = 0.95,
+  number_repetitions = 100
 )
 }
 \arguments{
-\item{formula}{Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical}
+\item{formula}{Formula of the form \code{response ~ predictor},
+where \code{predictor} defines the two groups of the explanatory variable and
+\code{response} is binary or a two-level categorical variable.}
 
-\item{data}{Dataset with columns for response and predictor variable}
+\item{data}{Data frame with columns for response and predictor variables.}
 
-\item{first_in_subtraction}{Value of predictor that should be first in order of subtraction for computing statistics}
+\item{first_in_subtraction}{Value of predictor variable
+that should be first in order of subtraction for computing
+difference in proportions.}
 
-\item{response_value_numerator}{Value of response that corresponds to "success" computing proportions}
+\item{response_value_numerator}{Value of response that corresponds
+to "success" when computing proportions.}
 
-\item{number_repetitions}{number of draws for bootstrap distribution}
+\item{confidence_level}{Confidence level for interval in decimal form.
+Defaults to 0.95 (95\% confidence interval).}
 
-\item{confidence_level}{confidence level to use for interval construction in decimal form.  Default is 95\%}
+\item{number_repetitions}{Number of bootstrapped resamples.}
 }
 \value{
 Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
 }
 \description{
-Function to build bootstrap confidence interval for the difference between two proportions
+Bootstrap confidence interval for a difference in proportions
 }
 \examples{
 data(pt)
 pt$twoSeconds <- ifelse(pt$responses >=2, "Yes", "No")
-two_proportion_bootstrap_CI(twoSeconds~brand, data = pt, first_in_subtraction = "B1",
-      response_value_numerator = "Yes", number_repetitions = 100, confidence_level = 0.95)
-
+two_proportion_bootstrap_CI(twoSeconds ~ brand,
+  data = pt,
+  first_in_subtraction = "B1",
+  response_value_numerator = "Yes",
+  confidence_level = 0.95,
+  number_repetitions = 1000)
 }

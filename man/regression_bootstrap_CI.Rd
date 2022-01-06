@@ -2,26 +2,32 @@
 % Please edit documentation in R/s216-applets.R
 \name{regression_bootstrap_CI}
 \alias{regression_bootstrap_CI}
-\title{Bootstrap confidence intervals for regression}
+\title{Bootstrap confidence interval for regression}
 \usage{
 regression_bootstrap_CI(
   formula,
   data,
-  confidence_level = 0.95,
   summary_measure = c("slope", "correlation"),
-  number_repetitions = 3
+  confidence_level = 0.95,
+  number_repetitions = 100
 )
 }
 \arguments{
-\item{formula}{Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical}
+\item{formula}{Formula of the form \code{response ~ predictor},
+where \code{predictor} defines a quantitative explanatory variable and
+\code{response} is a quantitative response variable.}
 
-\item{data}{Dataset with columns for response and predictor variable}
+\item{data}{Data frame with columns for response and predictor variables.}
 
-\item{confidence_level}{confidence level to use for interval in decimal form.  Default is for 95\% CI}
+\item{summary_measure}{Name of summary measure to return from simulations.
+Allowed values are
+\code{"slope"} for test of slope or
+\code{"correlation"} for test of correlation.}
 
-\item{summary_measure}{"slope" for test of slope or "correlation" for test of correlation}
+\item{confidence_level}{Confidence level for interval in decimal form.
+Defaults to 0.95 (95\% confidence interval).}
 
-\item{number_repetitions}{number of draws for bootstrap simulation}
+\item{number_repetitions}{Number of bootstrapped resamples.}
 }
 \description{
 Function to create bootstrap confidence interval for slope of simple linear regression or correlation between two quantitative variables
@@ -29,6 +35,9 @@ Function to create bootstrap confidence interval for slope of simple linear regr
 \examples{
 data(mtfires)
 mtfires$logHect  <- log(mtfires$Hectares)
-regression_bootstrap_CI(logHect~Temperature, data = mtfires, summary_measure = "correlation",
-             confidence_level = 0.9, number_repetitions = 1000)
+regression_bootstrap_CI(logHect ~ Temperature,
+  data = mtfires,
+  summary_measure = "correlation",
+  confidence_level = 0.9,
+  number_repetitions = 1000)
 }

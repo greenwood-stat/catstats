@@ -2,29 +2,35 @@
 % Please edit documentation in R/s216-applets.R
 \name{regression_test}
 \alias{regression_test}
-\title{Simulation-based test for regression}
+\title{Simulation-based hypothesis test for regression}
 \usage{
 regression_test(
   formula,
   data,
   summary_measure = c("slope", "correlation"),
-  direction = c("greater", "less", "two-sided"),
   as_extreme_as,
-  number_repetitions = 3
+  direction = c("greater", "less", "two-sided"),
+  number_repetitions = 1
 )
 }
 \arguments{
-\item{formula}{formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical}
+\item{formula}{Formula of the form \code{response ~ predictor},
+where \code{predictor} defines a quantitative explanatory variable and
+\code{response} is a quantitative response variable.}
 
-\item{data}{dataset with columns for response and predictor variable}
+\item{data}{Data frame with columns for response and predictor variables.}
 
-\item{summary_measure}{"slope" for test of slope or "correlation" for test of correlation}
+\item{summary_measure}{Name of summary measure to return from simulations.
+Allowed values are
+\code{"slope"} for test of slope or
+\code{"correlation"} for test of correlation.}
 
-\item{direction}{one of "greater", "less", or "two-sided" to give direction of hypothsis test}
+\item{as_extreme_as}{Value of observed slope or correlation.}
 
-\item{as_extreme_as}{value of observed statistic.}
+\item{direction}{Direction of alternative hypothesis.
+Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 
-\item{number_repetitions}{number of draws for simulation test}
+\item{number_repetitions}{Number of simulated samples.}
 }
 \description{
 Function to perform simulation-based test for slope of simple linear regression or correlation between two quantitative variables
@@ -32,7 +38,10 @@ Function to perform simulation-based test for slope of simple linear regression 
 \examples{
 data(mtfires)
 mtfires$logHect  <- log(mtfires$Hectares)
-regression_test(logHect~Temperature, data = mtfires,
-         direction = "greater", summary_measure = "correlation",
-         as_extreme_as = 1.388, number_repetitions = 1000)
+regression_test(logHect ~ Temperature,
+  data = mtfires,
+  summary_measure = "correlation",
+  as_extreme_as = 1.388,
+  direction = "greater",
+  number_repetitions = 1000)
 }

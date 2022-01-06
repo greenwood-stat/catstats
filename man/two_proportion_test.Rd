@@ -2,44 +2,53 @@
 % Please edit documentation in R/s216-applets.R
 \name{two_proportion_test}
 \alias{two_proportion_test}
-\title{Function to perform hypothesis test for equality of two proportions using simulation}
+\title{Simulation-based hypothesis test for a difference in proportions}
 \usage{
 two_proportion_test(
   formula,
   data,
   first_in_subtraction,
   response_value_numerator,
-  number_repetitions = 1,
   as_extreme_as,
-  direction = c("greater", "less", "two-sided")
+  direction = c("greater", "less", "two-sided"),
+  number_repetitions = 1
 )
 }
 \arguments{
-\item{formula}{Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical}
+\item{formula}{Formula of the form \code{response ~ predictor},
+where \code{predictor} defines the two groups of the explanatory variable and
+\code{response} is binary or a two-level categorical variable.}
 
-\item{data}{Dataset with columns for response and predictor variable}
+\item{data}{Data frame with columns for response and predictor variables.}
 
-\item{first_in_subtraction}{Value of predictor that should be first in order of subtraction for computing statistics}
+\item{first_in_subtraction}{Value of predictor variable
+that should be first in order of subtraction for computing
+difference in proportions.}
 
-\item{response_value_numerator}{Value of response that corresponds to "success" computing proportions}
+\item{response_value_numerator}{Value of response that corresponds
+to "success" when computing proportions.}
 
-\item{number_repetitions}{number of draws for simulation test}
+\item{as_extreme_as}{Value of observed difference in proportions.}
 
-\item{as_extreme_as}{value of observed statistic.}
+\item{direction}{Direction of alternative hypothesis.
+Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 
-\item{direction}{one of "greater", "less", or "two-sided" to give direction of hypothsis test}
+\item{number_repetitions}{Number of simulated samples.}
 }
 \value{
 Produces mosaic plot of observed proportions and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
 }
 \description{
-Function to perform hypothesis test for equality of two proportions using simulation
+Simulation-based hypothesis test for a difference in proportions
 }
 \examples{
 data(pt)
 pt$twoSeconds <- ifelse(pt$responses >=2, "Yes", "No")
-two_proportion_test(twoSeconds~brand, data = pt, first_in_subtraction = "B1",
-           response_value_numerator = "Yes", number_repetitions = 100, as_extreme_as = -.4,
-           direction = "two-sided")
-
+two_proportion_test(twoSeconds ~ brand,
+  data = pt,
+  first_in_subtraction = "B1",
+  response_value_numerator = "Yes",
+  as_extreme_as = -.4,
+  direction = "two-sided",
+  number_repetitions = 1000)
 }

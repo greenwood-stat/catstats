@@ -2,36 +2,36 @@
 % Please edit documentation in R/s216-applets.R
 \name{one_proportion_test}
 \alias{one_proportion_test}
-\title{One proportion simulation-based hypothesis test}
+\title{Simulation-based hypothesis test for one proportion}
 \usage{
 one_proportion_test(
   probability_success = 0.5,
   sample_size = 5,
-  number_repetitions = 1,
   summary_measure = c("number", "proportion"),
   as_extreme_as,
-  direction = c("greater", "less", "two-sided")
+  direction = c("greater", "less", "two-sided"),
+  number_repetitions = 1
 )
 }
 \arguments{
-\item{probability_success}{value between 0 and 1
+\item{probability_success}{Value between 0 and 1
 representing the null hypothesis value for proportion.}
 
-\item{sample_size}{number of trials used to compute proportion.}
+\item{sample_size}{Number of trials used to compute proportion.}
 
-\item{number_repetitions}{number of draws for simulation test.}
-
-\item{summary_measure}{value to return from simulations.
+\item{summary_measure}{Name of summary measure to return from simulations.
 Allowed values are
 \code{"number"} for number of successes or
 \code{"proportion"} for proportion of successes.}
 
-\item{as_extreme_as}{value of observed statistic.
+\item{as_extreme_as}{Value of observed statistic.
 Between 0 and 1 if \code{summary_measure} is \code{"proportion"};
 an integer between 1 and \code{sample_size} if \code{summary_measure} is \code{"number"}.}
 
-\item{direction}{direction of alternative hypothesis.
+\item{direction}{Direction of alternative hypothesis.
 Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
+
+\item{number_repetitions}{Number of simulated samples.}
 }
 \value{
 Plot of distribution of simulated values,
@@ -47,8 +47,8 @@ for the value of a single proportion.
 \examples{
 one_proportion_test(probability_success = 0.5,
   sample_size = 150,
-  number_repetitions = 100,
+  summary_measure = "proportion",
   as_extreme_as = 0.65,
   direction = "greater",
-  summary_measure = "proportion")
+  number_repetitions = 1000)
 }

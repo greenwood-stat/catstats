@@ -2,36 +2,43 @@
 % Please edit documentation in R/s216-applets.R
 \name{two_mean_bootstrap_CI}
 \alias{two_mean_bootstrap_CI}
-\title{Function to create bootstrap confidence interval for difference in two means}
+\title{Bootstrap confidence interval for a difference in means}
 \usage{
 two_mean_bootstrap_CI(
   formula,
   data,
   first_in_subtraction,
   confidence_level = 0.95,
-  number_repetitions = 3
+  number_repetitions = 100
 )
 }
 \arguments{
-\item{formula}{Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical}
+\item{formula}{Formula of the form \code{response ~ predictor},
+where \code{predictor} defines the two groups of the explanatory variable and
+\code{response} is a quantitative response variable.}
 
-\item{data}{Dataset with columns for response and predictor variable}
+\item{data}{Data frame with columns for response and predictor variables.}
 
-\item{first_in_subtraction}{Value of predictor that should be first in order of subtraction for computing statistics}
+\item{first_in_subtraction}{Value of predictor variable
+that should be first in order of subtraction for computing
+difference in means.}
 
-\item{confidence_level}{confidence level to use for interval construction in decimal form.  Default is 95\%}
+\item{confidence_level}{Confidence level for interval in decimal form.
+Defaults to 0.95 (95\% confidence interval).}
 
-\item{number_repetitions}{number of draws for simulation test}
+\item{number_repetitions}{Number of bootstrapped resamples.}
 }
 \value{
 Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
 }
 \description{
-Function to create bootstrap confidence interval for difference in two means
+Bootstrap confidence interval for a difference in means
 }
 \examples{
 data(pt)
-two_mean_bootstrap_CI(responses~brand, data = pt, first_in_subtraction = "B1",
-           number_repetitions = 100, confidence_level = 0.98)
-
+two_mean_bootstrap_CI(responses ~ brand,
+  data = pt,
+  first_in_subtraction = "B1",
+  confidence_level = 0.98,
+  number_repetitions = 1000)
 }

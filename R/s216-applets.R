@@ -1,20 +1,20 @@
-#' One proportion simulation-based hypothesis test
+#' Simulation-based hypothesis test for one proportion
 #'
 #' This function will run a simulation-based hypothesis test
 #' for the value of a single proportion.
 #'
-#' @param probability_success value between 0 and 1
+#' @param probability_success Value between 0 and 1
 #'    representing the null hypothesis value for proportion.
-#' @param sample_size number of trials used to compute proportion.
-#' @param number_repetitions number of draws for simulation test.
-#' @param summary_measure value to return from simulations.
+#' @param sample_size Number of trials used to compute proportion.
+#' @param number_repetitions Number of simulated samples.
+#' @param summary_measure Name of summary measure to return from simulations.
 #'    Allowed values are
 #'    `"number"` for number of successes or
 #'    `"proportion"` for proportion of successes.
-#' @param as_extreme_as value of observed statistic.
+#' @param as_extreme_as Value of observed statistic.
 #'    Between 0 and 1 if `summary_measure` is `"proportion"`;
 #'    an integer between 1 and `sample_size` if `summary_measure` is `"number"`.
-#' @param direction direction of alternative hypothesis.
+#' @param direction Direction of alternative hypothesis.
 #'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
 #' @return Plot of distribution of simulated values,
 #'    with values as or more extreme than specified
@@ -24,19 +24,18 @@
 #' @examples
 #' one_proportion_test(probability_success = 0.5,
 #'   sample_size = 150,
-#'   number_repetitions = 100,
+#'   summary_measure = "proportion",
 #'   as_extreme_as = 0.65,
 #'   direction = "greater",
-#'   summary_measure = "proportion")
+#'   number_repetitions = 1000)
 #' @export
-
 
 one_proportion_test <- function(probability_success = 0.5,
                                 sample_size = 5,
-                                number_repetitions = 1,
                                 summary_measure = c("number", "proportion"),
                                 as_extreme_as,
-                                direction = c("greater", "less", "two-sided")){
+                                direction = c("greater", "less", "two-sided"),
+                                number_repetitions = 1){
   if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
     stop("number of repetitions must be positive and integer valued")
   if(sample_size < 1 | !(sample_size %%1 == 0))
@@ -241,21 +240,26 @@ one_proportion_test <- function(probability_success = 0.5,
 }
 
 
-#' Function to produce bootstrap confidence interval for one proportion
+#' Bootstrap confidence interval for one proportion
 #'
-#' @param sample_size number of trials used to compute proportion
-#' @param number_successes how many successes were observed in those trials?
-#' @param number_repetitions number of draws for simulation test
-#' @param confidence_level confidence level for interval in decimal form.  Defaults to 95%
+#' @param sample_size Number of trials used to compute proportion.
+#' @param number_successes How many successes were observed in those trials?
+#' @param number_repetitions Number of bootstrapped resamples.
+#' @param confidence_level Confidence level for interval in decimal form.
+#'   Defaults to 0.95 (95% confidence interval).
 #'
 #' @return Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
 #' @examples
-#' one_proportion_bootstrap_CI(sample_size = 150, number_successes = 98, number_repetitions = 100,
-#'                       confidence_level = 0.99)
+#' one_proportion_bootstrap_CI(sample_size = 150,
+#'    number_successes = 98,
+#'    confidence_level = 0.99,
+#'    number_repetitions = 1000)
 #' @export
 
-one_proportion_bootstrap_CI <- function(sample_size, number_successes,
-                                        number_repetitions = 100, confidence_level = 0.95){
+one_proportion_bootstrap_CI <- function(sample_size,
+                                        number_successes,
+                                        confidence_level = 0.95,
+                                        number_repetitions = 100){
   if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
     stop("number of repetitions must be positive and integer valued")
   if(number_successes < 1 | !(number_successes %%1 == 0))
@@ -307,10 +311,13 @@ one_proportion_bootstrap_CI <- function(sample_size, number_successes,
 
 
 
-#' Function to produce plot of observed matched pairs data
+#' Plots for observed matched pairs data
 #'
-#' @param data two- or three-column data frame, with values for each group in last two columns
-#' @param first 1 if subtracting second column from first; 2 if subtracting first column from second (default is 1)
+#' @param data Two- or three-column data frame
+#'   with values for each group in last two columns.
+#' @param which_first Which column is first in order of subtraction?
+#'   `1` if subtracting second column from first (1 - 2);
+#'   `2` if subtracting first column from second (2 - 1). Defaults to `1`.
 #'
 #' @return Produces plot of distribution of observed values, with means & SDs in groups and paired observations linked by a line segment
 #'
@@ -318,18 +325,19 @@ one_proportion_bootstrap_CI <- function(sample_size, number_successes,
 #' set.seed(117)
 #' x <- rnorm(25)
 #' y <- x + 1 + rnorm(25, 0, 1.8)
-#' data <- data.frame(x,y)
-#' paired_observed_plot(data)
+#' data <- data.frame(x, y)
+#' paired_observed_plot(data, which_first = 1)
 #' @export
 
-paired_observed_plot <- function(data, first = 1){
+paired_observed_plot <- function(data,
+                                 which_first = 1){
   if(ncol(data) < 2 | ncol(data) > 3)
     stop("Data should have two or three columns")
   if(ncol(data) == 3)
     data <- data[,2:3]
 
   differences <- data[,1]-data[,2]
-  if(first == 2)
+  if(which_first == 2)
     differences <- data[,2]-data[,1]
 
   rg <- max(data) - min(data)
@@ -371,14 +379,18 @@ paired_observed_plot <- function(data, first = 1){
 
 
 
-#' Function to run simulation test for matched pairs
+#' Simulation-based hypothesis test for a paired mean difference
 #'
-#' @param data vector of differences or a two- or three-column data frame, with values for each group in last two columns
-#' @param shift amount to shift differences for bootstrapping of null distribution
-#' @param number_repetitions number of draws for simulation test
-#' @param as_extreme_as value of observed statistic.
-#' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
-#' @param which_first For order of subtraction - which column should be first?
+#' @param data Vector of differences or a
+#'   two- or three-column data frame with values for each group in last two columns.
+#' @param shift Amount to shift differences for bootstrapping of null distribution.
+#' @param number_repetitions Number of simulated samples.
+#' @param as_extreme_as Value of observed paired mean difference.
+#' @param direction Direction of alternative hypothesis.
+#'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
+#' @param which_first Which column is first in order of subtraction?
+#'   `1` if subtracting second column from first (1 - 2);
+#'   `2` if subtracting first column from second (2 - 1). Defaults to `1`.
 #'
 #' @return Produces plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
 #' @examples
@@ -387,14 +399,21 @@ paired_observed_plot <- function(data, first = 1){
 #' y <- x + 1 + rnorm(25, 0, 1.8)
 #' data <- data.frame(x,y)
 #' obs_diff <- mean(x - y)
-#' paired_test(data, shift = -obs_diff, direction = "two-sided", as_extreme_as = obs_diff,
-#'          number_repetitions = 100, which_first = 1)
+#' paired_test(data,
+#'   which_first = 1,
+#'   shift = -obs_diff,
+#'   as_extreme_as = obs_diff,
+#'   direction = "two-sided",
+#'   number_repetitions = 1000)
 #' @export
 
-
-paired_test <- function(data, shift = 0, direction = c("greater", "less", "two-sided"),
-                        as_extreme_as, number_repetitions = 3, which_first = 1){
-    if(!(direction %in% c("greater", "less", "two-sided")))
+paired_test <- function(data,
+                        which_first = 1,
+                        shift = 0,
+                        as_extreme_as,
+                        direction = c("greater", "less", "two-sided"),
+                        number_repetitions = 1){
+  if(!(direction %in% c("greater", "less", "two-sided")))
         stop("direction must be 'greater', 'less', or 'two-sided'")
     if(is.null(as_extreme_as))
         stop("Must enter cutoff value for 'as_extreme_as")
@@ -473,12 +492,16 @@ paired_test <- function(data, shift = 0, direction = c("greater", "less", "two-s
 }
 
 
-#' Function to run bootstrap confidence interval for matched pairs data
+#' Bootstrap confidence interval for a paired mean difference
 #'
-#' @param data vector of differences or a two- or three-column data frame, with values for each group in last two columns
-#' @param number_repetitions number of draws for bootstrap simulation
-#' @param which_first For order of subtraction - which column should be first?
-#' @param confidence_level confidence level for interval in decimal form.  Defaults to 95%
+#' @param data Vector of differences or a two- or three-column data frame
+#'   with values for each group in last two columns.
+#' @param number_repetitions Number of bootstrapped resamples.
+#' @param which_first Which column is first in order of subtraction?
+#'   `1` if subtracting second column from first (1 - 2);
+#'   `2` if subtracting first column from second (2 - 1). Defaults to `1`.
+#' @param confidence_level Confidence level for interval in decimal form.
+#'   Defaults to `0.95` (95% confidence interval).
 #'
 #' @return Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
 #'
@@ -487,13 +510,17 @@ paired_test <- function(data, shift = 0, direction = c("greater", "less", "two-s
 #' x <- rnorm(25)
 #' y <- x + 1 + rnorm(25, 0, 1.8)
 #' data <- data.frame(x,y)
-#' paired_bootstrap_CI(data, number_repetitions = 100, confidence_level = 0.9, which_first = 1)
+#' paired_bootstrap_CI(data,
+#'   which_first = 1,
+#'   confidence_level = 0.9,
+#'   number_repetitions = 1000)
 #' @export
 
-
-paired_bootstrap_CI <- function(data, number_repetitions = 100, confidence_level = 0.95,
-                                which_first = 1){
-    if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
+paired_bootstrap_CI <- function(data,
+                                which_first = 1,
+                                confidence_level = 0.95,
+                                number_repetitions = 100){
+  if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
         stop("number of repetitions must be positive and integer valued")
     if(confidence_level < 0 | confidence_level > 1)
         stop("Confidence level must be given in decimal form")
@@ -550,31 +577,43 @@ paired_bootstrap_CI <- function(data, number_repetitions = 100, confidence_level
 }
 
 
-#' Function to perform hypothesis test for equality of two proportions using simulation
-#' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
-#' @param data Dataset with columns for response and predictor variable
-#' @param first_in_subtraction Value of predictor that should be first in order of subtraction for computing statistics
-#' @param response_value_numerator Value of response that corresponds to "success" computing proportions
-#' @param number_repetitions number of draws for simulation test
-#' @param as_extreme_as value of observed statistic.
-#' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
+#' Simulation-based hypothesis test for a difference in proportions
+#'
+#' @param formula Formula of the form `response ~ predictor`,
+#'   where `predictor` defines the two groups of the explanatory variable and
+#'   `response` is binary or a two-level categorical variable.
+#' @param data Data frame with columns for response and predictor variables.
+#' @param first_in_subtraction Value of predictor variable
+#'   that should be first in order of subtraction for computing
+#'   difference in proportions.
+#' @param response_value_numerator Value of response that corresponds
+#'   to "success" when computing proportions.
+#' @param number_repetitions Number of simulated samples.
+#' @param as_extreme_as Value of observed difference in proportions.
+#' @param direction Direction of alternative hypothesis.
+#'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
 #'
 #' @return Produces mosaic plot of observed proportions and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
 #'
 #' @examples
 #' data(pt)
 #' pt$twoSeconds <- ifelse(pt$responses >=2, "Yes", "No")
-#' two_proportion_test(twoSeconds~brand, data = pt, first_in_subtraction = "B1",
-#'            response_value_numerator = "Yes", number_repetitions = 100, as_extreme_as = -.4,
-#'            direction = "two-sided")
-#'
+#' two_proportion_test(twoSeconds ~ brand,
+#'   data = pt,
+#'   first_in_subtraction = "B1",
+#'   response_value_numerator = "Yes",
+#'   as_extreme_as = -.4,
+#'   direction = "two-sided",
+#'   number_repetitions = 1000)
 #' @export
 
-
-two_proportion_test <- function(formula, data, first_in_subtraction,
+two_proportion_test <- function(formula,
+                                data,
+                                first_in_subtraction,
                                 response_value_numerator,
-                                number_repetitions = 1, as_extreme_as,
-                                direction = c("greater", "less", "two-sided")){
+                                as_extreme_as,
+                                direction = c("greater", "less", "two-sided"),
+                                number_repetitions = 1){
   if(!(direction %in% c("greater", "less", "two-sided")))
     stop("Direction must be one of 'greater',  'less', or 'two-sided'")
   if(number_repetitions < 1 | number_repetitions %% 1 != 0)
@@ -666,28 +705,40 @@ two_proportion_test <- function(formula, data, first_in_subtraction,
 }
 
 
-#' Function to build bootstrap confidence interval for the difference between two proportions
+#' Bootstrap confidence interval for a difference in proportions
 #'
-#' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
-#' @param data Dataset with columns for response and predictor variable
-#' @param first_in_subtraction Value of predictor that should be first in order of subtraction for computing statistics
-#' @param response_value_numerator Value of response that corresponds to "success" computing proportions
-#' @param number_repetitions number of draws for bootstrap distribution
-#' @param confidence_level confidence level to use for interval construction in decimal form.  Default is 95%
+#' @param formula Formula of the form `response ~ predictor`,
+#'   where `predictor` defines the two groups of the explanatory variable and
+#'   `response` is binary or a two-level categorical variable.
+#' @param data Data frame with columns for response and predictor variables.
+#' @param first_in_subtraction Value of predictor variable
+#'   that should be first in order of subtraction for computing
+#'   difference in proportions.
+#' @param response_value_numerator Value of response that corresponds
+#'   to "success" when computing proportions.
+#' @param number_repetitions Number of bootstrapped resamples.
+#' @param confidence_level Confidence level for interval in decimal form.
+#'   Defaults to 0.95 (95% confidence interval).
 #'
 #' @return Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
 #'
 #' @examples
 #' data(pt)
 #' pt$twoSeconds <- ifelse(pt$responses >=2, "Yes", "No")
-#' two_proportion_bootstrap_CI(twoSeconds~brand, data = pt, first_in_subtraction = "B1",
-#'       response_value_numerator = "Yes", number_repetitions = 100, confidence_level = 0.95)
-#'
+#' two_proportion_bootstrap_CI(twoSeconds ~ brand,
+#'   data = pt,
+#'   first_in_subtraction = "B1",
+#'   response_value_numerator = "Yes",
+#'   confidence_level = 0.95,
+#'   number_repetitions = 1000)
 #' @export
 
-two_proportion_bootstrap_CI <- function(formula, data, first_in_subtraction,
+two_proportion_bootstrap_CI <- function(formula,
+                                        data,
+                                        first_in_subtraction,
                                         response_value_numerator,
-                                        number_repetitions = 1, confidence_level = 0.95){
+                                        confidence_level = 0.95,
+                                        number_repetitions = 100){
   if(number_repetitions < 1 | number_repetitions %% 1 != 0)
     stop("number of repetitions must be positive and integer valued")
   resp.name <- all.vars(formula)[1]
@@ -759,26 +810,38 @@ two_proportion_bootstrap_CI <- function(formula, data, first_in_subtraction,
 }
 
 
-#' Function to perform hypothesis test for equality of two means using simulation
-#' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
-#' @param data Dataset with columns for response and predictor variable
-#' @param first_in_subtraction Value of predictor that should be first in order of subtraction for computing statistics
-#' @param number_repetitions number of draws for simulation test
-#' @param as_extreme_as value of observed statistic.
-#' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
+#' Simulation-based hypothesis test for a difference in means
+#'
+#' @param formula Formula of the form `response ~ predictor`,
+#'   where `predictor` defines the two groups of the explanatory variable and
+#'   `response` is a quantitative response variable.
+#' @param data Data frame with columns for response and predictor variables.
+#' @param first_in_subtraction Value of predictor variable
+#'   that should be first in order of subtraction for computing
+#'   difference in means.
+#' @param number_repetitions Number of simulated samples.
+#' @param as_extreme_as Value of observed difference in means.
+#' @param direction Direction of alternative hypothesis.
+#'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
 #'
 #' @return Produces side-by-side boxplots of observed data and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
 #'
 #' @examples
 #' data(pt)
-#' two_mean_test(responses~brand, data = pt, first_in_subtraction = "B1",
-#'           number_repetitions = 100, as_extreme_as = -.4, direction = "two-sided")
-#'
+#' two_mean_test(responses ~ brand,
+#'   data = pt,
+#'   first_in_subtraction = "B1",
+#'   as_extreme_as = -.4,
+#'   direction = "two-sided",
+#'   number_repetitions = 1000)
 #' @export
 
-two_mean_test <- function(formula, data, first_in_subtraction,
+two_mean_test <- function(formula,
+                          data,
+                          first_in_subtraction,
+                          as_extreme_as,
                           direction = c("greater", "less", "two-sided"),
-                          as_extreme_as, number_repetitions = 3){
+                          number_repetitions = 1){
   if(!(direction %in% c("greater", "less", "two-sided")))
     stop("direction must be 'greater', 'less', or 'two-sided'")
   if(is.null(as_extreme_as))
@@ -873,24 +936,35 @@ two_mean_test <- function(formula, data, first_in_subtraction,
 }
 
 
-#' Function to create bootstrap confidence interval for difference in two means
-#' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
-#' @param data Dataset with columns for response and predictor variable
-#' @param first_in_subtraction Value of predictor that should be first in order of subtraction for computing statistics
-#' @param number_repetitions number of draws for simulation test
-#' @param confidence_level confidence level to use for interval construction in decimal form.  Default is 95%
+#' Bootstrap confidence interval for a difference in means
+#'
+#' @param formula Formula of the form `response ~ predictor`,
+#'   where `predictor` defines the two groups of the explanatory variable and
+#'   `response` is a quantitative response variable.
+#' @param data Data frame with columns for response and predictor variables.
+#' @param first_in_subtraction Value of predictor variable
+#'   that should be first in order of subtraction for computing
+#'   difference in means.
+#' @param number_repetitions Number of bootstrapped resamples.
+#' @param confidence_level Confidence level for interval in decimal form.
+#'   Defaults to 0.95 (95% confidence interval).
 #'
 #' @return Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
 #'
 #' @examples
 #' data(pt)
-#' two_mean_bootstrap_CI(responses~brand, data = pt, first_in_subtraction = "B1",
-#'            number_repetitions = 100, confidence_level = 0.98)
-#'
+#' two_mean_bootstrap_CI(responses ~ brand,
+#'   data = pt,
+#'   first_in_subtraction = "B1",
+#'   confidence_level = 0.98,
+#'   number_repetitions = 1000)
 #' @export
-two_mean_bootstrap_CI <- function(formula, data, first_in_subtraction,
+
+two_mean_bootstrap_CI <- function(formula,
+                                  data,
+                                  first_in_subtraction,
                                   confidence_level = 0.95,
-                                  number_repetitions = 3){
+                                  number_repetitions = 100){
   if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
     stop("number of repetitions must be positive and integer valued")
   resp.name <- all.vars(formula)[1]
@@ -948,28 +1022,40 @@ two_mean_bootstrap_CI <- function(formula, data, first_in_subtraction,
        pos = c(2, 4), cex = .75)
 }
 
-#' Simulation-based test for regression
+#' Simulation-based hypothesis test for regression
 #'
 #' Function to perform simulation-based test for slope of simple linear regression or correlation between two quantitative variables
 #'
-#' @param formula formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
-#' @param data dataset with columns for response and predictor variable
-#' @param summary_measure "slope" for test of slope or "correlation" for test of correlation
-#' @param as_extreme_as value of observed statistic.
-#' @param direction one of "greater", "less", or "two-sided" to give direction of hypothsis test
-#' @param number_repetitions number of draws for simulation test
+#' @param formula Formula of the form `response ~ predictor`,
+#'   where `predictor` defines a quantitative explanatory variable and
+#'   `response` is a quantitative response variable.
+#' @param data Data frame with columns for response and predictor variables.
+#' @param summary_measure Name of summary measure to return from simulations.
+#'    Allowed values are
+#'    `"slope"` for test of slope or
+#'    `"correlation"` for test of correlation.
+#' @param as_extreme_as Value of observed slope or correlation.
+#' @param direction Direction of alternative hypothesis.
+#'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
+#' @param number_repetitions Number of simulated samples.
 #'
 #' @examples
 #' data(mtfires)
 #' mtfires$logHect  <- log(mtfires$Hectares)
-#' regression_test(logHect~Temperature, data = mtfires,
-#'          direction = "greater", summary_measure = "correlation",
-#'          as_extreme_as = 1.388, number_repetitions = 1000)
+#' regression_test(logHect ~ Temperature,
+#'   data = mtfires,
+#'   summary_measure = "correlation",
+#'   as_extreme_as = 1.388,
+#'   direction = "greater",
+#'   number_repetitions = 1000)
 #' @export
 
-regression_test <- function(formula, data,  summary_measure = c("slope", "correlation"),
+regression_test <- function(formula,
+                            data,
+                            summary_measure = c("slope", "correlation"),
+                            as_extreme_as,
                             direction = c("greater", "less", "two-sided"),
-                            as_extreme_as, number_repetitions = 3){
+                            number_repetitions = 1){
   if(!(summary_measure %in% c("slope", "correlation")))
     stop("Summary measure must be either slope or correlation")
   if(!(direction %in% c("greater", "less", "two-sided")))
@@ -1062,26 +1148,37 @@ regression_test <- function(formula, data,  summary_measure = c("slope", "correl
 }
 
 
-#' Bootstrap confidence intervals for regression
+#' Bootstrap confidence interval for regression
 #'
 #' Function to create bootstrap confidence interval for slope of simple linear regression or correlation between two quantitative variables
 #'
-#' @param formula Formula of the form response~predictor, where predictor defines two groups and response is binary or two-level categorical
-#' @param data Dataset with columns for response and predictor variable
-#' @param summary_measure "slope" for test of slope or "correlation" for test of correlation
-#' @param confidence_level confidence level to use for interval in decimal form.  Default is for 95% CI
-#' @param number_repetitions number of draws for bootstrap simulation
+#' @param formula Formula of the form `response ~ predictor`,
+#'   where `predictor` defines a quantitative explanatory variable and
+#'   `response` is a quantitative response variable.
+#' @param data Data frame with columns for response and predictor variables.
+#' @param summary_measure Name of summary measure to return from simulations.
+#'    Allowed values are
+#'    `"slope"` for test of slope or
+#'    `"correlation"` for test of correlation.
+#' @param confidence_level Confidence level for interval in decimal form.
+#'   Defaults to 0.95 (95% confidence interval).
+#' @param number_repetitions Number of bootstrapped resamples.
 #'
 #' @examples
 #' data(mtfires)
 #' mtfires$logHect  <- log(mtfires$Hectares)
-#' regression_bootstrap_CI(logHect~Temperature, data = mtfires, summary_measure = "correlation",
-#'              confidence_level = 0.9, number_repetitions = 1000)
+#' regression_bootstrap_CI(logHect ~ Temperature,
+#'   data = mtfires,
+#'   summary_measure = "correlation",
+#'   confidence_level = 0.9,
+#'   number_repetitions = 1000)
 #' @export
 
-regression_bootstrap_CI <- function(formula, data, confidence_level = 0.95,
+regression_bootstrap_CI <- function(formula,
+                                    data,
                                     summary_measure = c("slope", "correlation"),
-                                    number_repetitions = 3){
+                                    confidence_level = 0.95,
+                                    number_repetitions = 100){
   if(!(summary_measure %in% c("slope", "correlation")))
     stop("Summary measure must be either slope or correlation")
   if(number_repetitions < 1 | !(number_repetitions %%1 == 0))

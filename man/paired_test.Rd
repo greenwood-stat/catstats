@@ -2,35 +2,39 @@
 % Please edit documentation in R/s216-applets.R
 \name{paired_test}
 \alias{paired_test}
-\title{Function to run simulation test for matched pairs}
+\title{Simulation-based hypothesis test for a paired mean difference}
 \usage{
 paired_test(
   data,
+  which_first = 1,
   shift = 0,
-  direction = c("greater", "less", "two-sided"),
   as_extreme_as,
-  number_repetitions = 3,
-  which_first = 1
+  direction = c("greater", "less", "two-sided"),
+  number_repetitions = 1
 )
 }
 \arguments{
-\item{data}{vector of differences or a two- or three-column data frame, with values for each group in last two columns}
+\item{data}{Vector of differences or a
+two- or three-column data frame with values for each group in last two columns.}
 
-\item{shift}{amount to shift differences for bootstrapping of null distribution}
+\item{which_first}{Which column is first in order of subtraction?
+\code{1} if subtracting second column from first (1 - 2);
+\code{2} if subtracting first column from second (2 - 1). Defaults to \code{1}.}
 
-\item{direction}{one of "greater", "less", or "two-sided" to give direction of hypothsis test}
+\item{shift}{Amount to shift differences for bootstrapping of null distribution.}
 
-\item{as_extreme_as}{value of observed statistic.}
+\item{as_extreme_as}{Value of observed paired mean difference.}
 
-\item{number_repetitions}{number of draws for simulation test}
+\item{direction}{Direction of alternative hypothesis.
+Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 
-\item{which_first}{For order of subtraction - which column should be first?}
+\item{number_repetitions}{Number of simulated samples.}
 }
 \value{
 Produces plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
 }
 \description{
-Function to run simulation test for matched pairs
+Simulation-based hypothesis test for a paired mean difference
 }
 \examples{
 set.seed(117)
@@ -38,6 +42,10 @@ x <- rnorm(25)
 y <- x + 1 + rnorm(25, 0, 1.8)
 data <- data.frame(x,y)
 obs_diff <- mean(x - y)
-paired_test(data, shift = -obs_diff, direction = "two-sided", as_extreme_as = obs_diff,
-         number_repetitions = 100, which_first = 1)
+paired_test(data,
+  which_first = 1,
+  shift = -obs_diff,
+  as_extreme_as = obs_diff,
+  direction = "two-sided",
+  number_repetitions = 1000)
 }

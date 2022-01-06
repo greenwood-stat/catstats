@@ -2,34 +2,41 @@
 % Please edit documentation in R/s216-applets.R
 \name{paired_bootstrap_CI}
 \alias{paired_bootstrap_CI}
-\title{Function to run bootstrap confidence interval for matched pairs data}
+\title{Bootstrap confidence interval for a paired mean difference}
 \usage{
 paired_bootstrap_CI(
   data,
-  number_repetitions = 100,
+  which_first = 1,
   confidence_level = 0.95,
-  which_first = 1
+  number_repetitions = 100
 )
 }
 \arguments{
-\item{data}{vector of differences or a two- or three-column data frame, with values for each group in last two columns}
+\item{data}{Vector of differences or a two- or three-column data frame
+with values for each group in last two columns.}
 
-\item{number_repetitions}{number of draws for bootstrap simulation}
+\item{which_first}{Which column is first in order of subtraction?
+\code{1} if subtracting second column from first (1 - 2);
+\code{2} if subtracting first column from second (2 - 1). Defaults to \code{1}.}
 
-\item{confidence_level}{confidence level for interval in decimal form.  Defaults to 95\%}
+\item{confidence_level}{Confidence level for interval in decimal form.
+Defaults to \code{0.95} (95\% confidence interval).}
 
-\item{which_first}{For order of subtraction - which column should be first?}
+\item{number_repetitions}{Number of bootstrapped resamples.}
 }
 \value{
 Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
 }
 \description{
-Function to run bootstrap confidence interval for matched pairs data
+Bootstrap confidence interval for a paired mean difference
 }
 \examples{
 set.seed(117)
 x <- rnorm(25)
 y <- x + 1 + rnorm(25, 0, 1.8)
 data <- data.frame(x,y)
-paired_bootstrap_CI(data, number_repetitions = 100, confidence_level = 0.9, which_first = 1)
+paired_bootstrap_CI(data,
+  which_first = 1,
+  confidence_level = 0.9,
+  number_repetitions = 1000)
 }
