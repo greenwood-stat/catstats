@@ -2,11 +2,20 @@ Package: catstats
 Title: Statistics for Montana State University Bobcats
 Version: 0.1
 Authors@R: 
+    c(
     person(given = "Mark",
            family = "Greenwood",
            role = c("aut", "cre"),
-           email = "greenwood@montana.edu")
-Description: Contains a suite of things that are used in instruction at Montana State University. Intended to make working in RStudio easier for the students on MSU. Also supports the textbook "Intermediate Statistics with R" written by Mark Greenwood. It contains functions for enhanced interaction plots. It also will install most packages needed for the materials in the courses.
+           email = "greenwood@montana.edu"),
+    person(given = "Stacey",
+           family = "Hancock",
+           role = "aut",
+           email = "stacey.hancock@montana.edu"),
+    person(given = "Nicole",
+           family = "Carnegie",
+           role = "aut")
+    )
+Description: Contains a suite of things that are used in instruction at Montana State University. Intended to make working in RStudio easier for the students at MSU. Also supports the textbooks "Intermediate Statistics with R" written by Mark Greenwood and "Montana State Introductory Statistics with R" written by Nicole Carnegie, Stacey Hancock, Elijah Meyer, Jade Schmidt, and Melinda Yager. This package contains functions for enhanced interaction plots and simulation-based inference. It also will install most packages needed for the materials in the courses.
 Depends:
     R (>= 3.6.2)
 Imports:
