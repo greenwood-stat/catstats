@@ -10,7 +10,8 @@ two_mean_test(
   first_in_subtraction,
   as_extreme_as,
   direction = c("greater", "less", "two-sided"),
-  number_repetitions = 1
+  number_repetitions = 1,
+  add_normal = FALSE
 )
 }
 \arguments{
@@ -30,6 +31,9 @@ difference in means.}
 Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 
 \item{number_repetitions}{Number of simulated samples.}
+
+\item{add_normal}{Logical value indicating whether to superimpose a normal
+curve on the histogram. Defaults to FALSE.}
 }
 \value{
 Produces side-by-side boxplots of observed data and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot

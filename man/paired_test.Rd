@@ -10,7 +10,8 @@ paired_test(
   shift = 0,
   as_extreme_as,
   direction = c("greater", "less", "two-sided"),
-  number_repetitions = 1
+  number_repetitions = 1,
+  add_normal = FALSE
 )
 }
 \arguments{
@@ -29,6 +30,9 @@ two- or three-column data frame with values for each group in last two columns.}
 Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 
 \item{number_repetitions}{Number of simulated samples.}
+
+\item{add_normal}{Logical value indicating whether to superimpose a normal
+curve on the histogram. Defaults to FALSE.}
 }
 \value{
 Produces plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot

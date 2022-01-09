@@ -11,7 +11,8 @@ two_proportion_test(
   response_value_numerator,
   as_extreme_as,
   direction = c("greater", "less", "two-sided"),
-  number_repetitions = 1
+  number_repetitions = 1,
+  add_normal = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,9 @@ to "success" when computing proportions.}
 Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 
 \item{number_repetitions}{Number of simulated samples.}
+
+\item{add_normal}{Logical value indicating whether to superimpose a normal
+curve on the histogram. Defaults to FALSE.}
 }
 \value{
 Produces mosaic plot of observed proportions and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot

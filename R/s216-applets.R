@@ -424,6 +424,8 @@ paired_observed_plot <- function(data,
 #' @param which_first Which column is first in order of subtraction?
 #'   `1` if subtracting second column from first (1 - 2);
 #'   `2` if subtracting first column from second (2 - 1). Defaults to `1`.
+#' @param add_normal Logical value indicating whether to superimpose a normal
+#'   curve on the histogram. Defaults to FALSE.
 #'
 #' @return Produces plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
 #' @examples
@@ -445,7 +447,8 @@ paired_test <- function(data,
                         shift = 0,
                         as_extreme_as,
                         direction = c("greater", "less", "two-sided"),
-                        number_repetitions = 1){
+                        number_repetitions = 1,
+                        add_normal = FALSE){
   if(!(direction %in% c("greater", "less", "two-sided")))
         stop("direction must be 'greater', 'less', or 'two-sided'")
     if(is.null(as_extreme_as))
@@ -512,6 +515,10 @@ paired_test <- function(data,
                                  count_extreme,
                                  "/", number_repetitions, " = ",
                                  round(count_extreme/number_repetitions,4), sep = ""))
+
+    if(add_normal == TRUE) {
+      add_norm(h, sim_diffs)
+    }
 
     legend("topright", legend = c(paste("Mean =", round(mean(sim_diffs, na.rm = T),3)),
                                   paste("SD =", round(sd(sim_diffs, na.rm = T),3))),
@@ -625,6 +632,8 @@ paired_bootstrap_CI <- function(data,
 #' @param as_extreme_as Value of observed difference in proportions.
 #' @param direction Direction of alternative hypothesis.
 #'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
+#' @param add_normal Logical value indicating whether to superimpose a normal
+#'   curve on the histogram. Defaults to FALSE.
 #'
 #' @return Produces mosaic plot of observed proportions and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
 #'
@@ -646,7 +655,8 @@ two_proportion_test <- function(formula,
                                 response_value_numerator,
                                 as_extreme_as,
                                 direction = c("greater", "less", "two-sided"),
-                                number_repetitions = 1){
+                                number_repetitions = 1,
+                                add_normal = FALSE){
   if(!(direction %in% c("greater", "less", "two-sided")))
     stop("Direction must be one of 'greater',  'less', or 'two-sided'")
   if(number_repetitions < 1 | number_repetitions %% 1 != 0)
@@ -680,19 +690,6 @@ two_proportion_test <- function(formula,
       row.pcts[setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'")))),
                eval(parse(text = paste0("'", response_value_numerator, "'")))]
   }
-  #par(mfrow = c(1,2), mar = c(4,4,3,0)+0.1, mgp = c(2,.5,0))
-
-  # plot(formula, data= data, main = "Observed Data")
-
-  # subtraction_order <- paste0("(",eval(parse(text = paste0("'", first_in_subtraction, "'"))),
-  #                             " - ",
-  #                             setdiff(unique(predictor),
-  #                             eval(parse(text = paste0("'", first_in_subtraction, "'")))),
-  #                             ")")
-  # legend("topright",
-  #        legend = c(paste("Obs diff =", round(obs.diff, 3)),
-  #                   subtraction_order),
-  #        col = "white", bty = "n")
 
   count_extreme <- ifelse(direction == "greater", sum(sim_diffs >= as_extreme_as),
                           ifelse(direction == "less", sum(sim_diffs <= as_extreme_as),
@@ -725,6 +722,10 @@ two_proportion_test <- function(formula,
                    count_extreme,
                    "/", number_repetitions, " = ",
                    round(count_extreme/number_repetitions,4), sep = ""))
+
+  if(add_normal == TRUE) {
+    add_norm(h, sim_diffs)
+  }
 
   legend("topright", legend = c(paste("Mean =", round(mean(sim_diffs, na.rm = T),3)),
                                 paste("SD =", round(sd(sim_diffs, na.rm = T),3))),
@@ -856,6 +857,8 @@ two_proportion_bootstrap_CI <- function(formula,
 #' @param as_extreme_as Value of observed difference in means.
 #' @param direction Direction of alternative hypothesis.
 #'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
+#' @param add_normal Logical value indicating whether to superimpose a normal
+#'   curve on the histogram. Defaults to FALSE.
 #'
 #' @return Produces side-by-side boxplots of observed data and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
 #'
@@ -874,7 +877,8 @@ two_mean_test <- function(formula,
                           first_in_subtraction,
                           as_extreme_as,
                           direction = c("greater", "less", "two-sided"),
-                          number_repetitions = 1){
+                          number_repetitions = 1,
+                          add_normal = FALSE){
   if(!(direction %in% c("greater", "less", "two-sided")))
     stop("direction must be 'greater', 'less', or 'two-sided'")
   if(is.null(as_extreme_as))
@@ -891,10 +895,8 @@ two_mean_test <- function(formula,
     stop("First term in order of subtraction must match values in data")
   n = nrow(data)
 
-
   obs.diff <- mean(response[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))]) -
     mean(response[predictor == setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'"))))])
-
 
   sim_diffs <- rep(NA, number_repetitions)
   for(i in 1:number_repetitions){
@@ -902,21 +904,6 @@ two_mean_test <- function(formula,
     sim_diffs[i] <- mean(newResponse[predictor == eval(parse(text = paste0("'", first_in_subtraction, "'")))]) -
       mean(newResponse[predictor == setdiff(unique(predictor), eval(parse(text = paste0("'", first_in_subtraction, "'"))))])
   }
-  # par(mfrow = c(1,2), mar = c(4,4,3,0)+0.1, mgp = c(2,.5,0))
-  #
-  # boxplot(formula, data= data, main = "Observed Data")
-
-  # subtraction_order <- paste0("(",
-  #           eval(parse(text = paste0("'",first_in_subtraction, "'"))),
-  #           " - ",
-  #           setdiff(unique(predictor),
-  #           eval(parse(text = paste0("'", first_in_subtraction, "'")))),
-  #           ")")
-  # group_max <- tapply(response, predictor, quantile, 0.8)
-  # legend(ifelse(group_max[1] > group_max[2], "topright", "topleft"),
-  #        legend = c(paste("Obs diff =", round(obs.diff, 3)),
-  #                               subtraction_order),
-  #        col = "white", bty = "n")
 
   count_extreme <- ifelse(direction == "greater", sum(sim_diffs >= as_extreme_as),
                           ifelse(direction == "less", sum(sim_diffs <= as_extreme_as),
@@ -956,6 +943,10 @@ two_mean_test <- function(formula,
                    count_extreme,
                    "/", number_repetitions, " = ",
                    round(count_extreme/number_repetitions,4), sep = ""))
+
+  if(add_normal == TRUE) {
+    add_norm(h, sim_diffs)
+  }
 
   legend("topright", legend = c(paste("Mean =", round(mean(sim_diffs, na.rm = T),3)),
                                 paste("SD =", round(sd(sim_diffs, na.rm = T),3))),
@@ -1071,6 +1062,8 @@ two_mean_bootstrap_CI <- function(formula,
 #' @param direction Direction of alternative hypothesis.
 #'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
 #' @param number_repetitions Number of simulated samples.
+#' @param add_normal Logical value indicating whether to superimpose a normal
+#'   curve on the histogram. Defaults to FALSE.
 #'
 #' @examples
 #' data(mtfires)
@@ -1088,7 +1081,8 @@ regression_test <- function(formula,
                             summary_measure = c("slope", "correlation"),
                             as_extreme_as,
                             direction = c("greater", "less", "two-sided"),
-                            number_repetitions = 1){
+                            number_repetitions = 1,
+                            add_normal = FALSE){
   if(!(summary_measure %in% c("slope", "correlation")))
     stop("Summary measure must be either slope or correlation")
   if(!(direction %in% c("greater", "less", "two-sided")))
@@ -1120,14 +1114,6 @@ regression_test <- function(formula,
     sim_vals <- sim_vals/sdRatio
     obs.stat <- obs.stat/sdRatio
   }
-  # par(mfrow = c(1,2), mar = c(4,4,3,0)+0.1, mgp = c(2,.5,0))
-  #
-  # plot(formula, data= data, main = "Observed Data", pch = 15)
-  # abline(obs.fit$coef, col = "red", lwd = 2)
-  #
-  # legend("topleft",
-  #        legend = c(paste("Obs", summary_measure, "=", round(obs.stat, 3))),
-  #        col = "white", bty = "n", cex = 0.75)
 
   count_extreme <- ifelse(direction == "greater",
                           sum(sim_vals >= as_extreme_as),
@@ -1168,6 +1154,10 @@ regression_test <- function(formula,
                    count_extreme,
                    "/", number_repetitions, " = ",
                    round(count_extreme/number_repetitions,4), sep = ""))
+
+  if(add_normal == TRUE) {
+    add_norm(h, sim_vals)
+  }
 
   legend("topright", legend = c(paste("Mean =", round(mean(sim_vals, na.rm = T),3)),
                                 paste("SD =", round(sd(sim_vals, na.rm = T),3))),

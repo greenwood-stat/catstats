@@ -10,7 +10,8 @@ regression_test(
   summary_measure = c("slope", "correlation"),
   as_extreme_as,
   direction = c("greater", "less", "two-sided"),
-  number_repetitions = 1
+  number_repetitions = 1,
+  add_normal = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,9 @@ Allowed values are
 Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 
 \item{number_repetitions}{Number of simulated samples.}
+
+\item{add_normal}{Logical value indicating whether to superimpose a normal
+curve on the histogram. Defaults to FALSE.}
 }
 \description{
 Function to perform simulation-based test for slope of simple linear regression or correlation between two quantitative variables
