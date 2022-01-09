@@ -10,6 +10,8 @@
 #' @param na.rm Logical value indicating whether NA values should
 #'   be stripped before the computation proceeds. Defaults to TRUE.
 #' @param ... Other \code{\link[graphics:par]{graphical parameters}}.
+#' @param add_normal Logical value indicating whether to superimpose a normal
+#'   curve on the histogram. Defaults to FALSE.
 #'
 #' @examples
 #' x <- rnorm(30, 5, 2)
@@ -68,7 +70,8 @@ one_proportion_test <- function(probability_success = 0.5,
                                 summary_measure = c("number", "proportion"),
                                 as_extreme_as,
                                 direction = c("greater", "less", "two-sided"),
-                                number_repetitions = 1){
+                                number_repetitions = 1,
+                                add_normal = FALSE){
   if(number_repetitions < 1 | !(number_repetitions %%1 == 0))
     stop("Number of repetitions must be positive and integer valued")
   if(sample_size < 1 | !(sample_size %%1 == 0))
@@ -199,7 +202,7 @@ one_proportion_test <- function(probability_success = 0.5,
     }
     proportion_extreme <- mean(number_heads <= lower | number_heads >= upper)
 
-    plot(0,0, "n", frame.plot = FALSE,
+    plot(0, 0, "n", frame.plot = FALSE,
          xlim = c(min(min(number_heads), lower-range_heads/5),
                             max(max(number_heads), upper + range_heads/5)),
          ylim = c(0, max(success_tab)+3),
@@ -265,6 +268,23 @@ one_proportion_test <- function(probability_success = 0.5,
                 "SD =",
                 round(sd(number_heads/sample_size, na.rm = T),3)),
           line = -3, side = 4, las = 2)
+  }
+
+  # Add normal curve
+  if(add_normal == TRUE) {
+    if(summary_measure == "number") {
+      h <- hist(number_heads,
+                breaks = seq(min(number_heads), max(number_heads), by = 1),
+                plot = FALSE)
+      add_norm(h, number_heads)
+    } else {
+      p <- number_heads/sample_size
+      h <- hist(p,
+                breaks = seq(min(p), max(p), by = 1/sample_size),
+                plot = FALSE)
+      add_norm(h, p)
+    }
+
   }
 
   # Set plot margins back
