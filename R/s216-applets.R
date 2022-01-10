@@ -1714,7 +1714,7 @@ regression_test <- function(formula,
     col.vec[cuts == levels(cuts)[1]] <- "red"
   }
   range_diffs <- max(sim_vals) - min(sim_vals)
-  ifelse(summary_measure <- "correlation",
+  ifelse(summary_measure == "correlation",
     xlabel <- "Correlation",
     xlabel <- "Slope"
   )
@@ -1843,7 +1843,7 @@ regression_bootstrap_CI <- function(formula,
   col.vec[cuts == levels(cuts)[3]] <- "red"
 
   break_range <- max(h$breaks) - min(h$breaks)
-  ifelse(summary_measure <- "correlation",
+  ifelse(summary_measure == "correlation",
     xlabel <- "Bootstrap Correlation",
     xlabel <- "Bootstrap Slope"
   )
