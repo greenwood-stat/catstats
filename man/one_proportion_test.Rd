@@ -33,6 +33,9 @@ an integer between 1 and \code{sample_size} if \code{summary_measure} is \code{"
 Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 
 \item{number_repetitions}{Number of simulated samples.}
+
+\item{add_normal}{Logical value indicating whether to superimpose a normal
+curve on the histogram. Defaults to FALSE.}
 }
 \value{
 Returns plot of distribution of simulated statistics,

@@ -27,9 +27,6 @@ histogram is frequency. Defaults to TRUE.}
 be stripped before the computation proceeds. Defaults to TRUE.}
 
 \item{...}{Other \code{\link[graphics:par]{graphical parameters}}.}
-
-\item{add_normal}{Logical value indicating whether to superimpose a normal
-curve on the histogram. Defaults to FALSE.}
 }
 \description{
 This function will add a normal curve to a frequency or density histogram

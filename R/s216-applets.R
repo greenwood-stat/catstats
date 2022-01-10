@@ -10,8 +10,6 @@
 #' @param na.rm Logical value indicating whether NA values should
 #'   be stripped before the computation proceeds. Defaults to TRUE.
 #' @param ... Other \code{\link[graphics:par]{graphical parameters}}.
-#' @param add_normal Logical value indicating whether to superimpose a normal
-#'   curve on the histogram. Defaults to FALSE.
 #'
 #' @examples
 #' x <- rnorm(30, 5, 2)
@@ -51,6 +49,8 @@ add_norm <- function(h, data, freq = TRUE, na.rm = FALSE,
 #'    an integer between 1 and `sample_size` if `summary_measure` is `"number"`.
 #' @param direction Direction of alternative hypothesis.
 #'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
+#' @param add_normal Logical value indicating whether to superimpose a normal
+#'   curve on the histogram. Defaults to FALSE.
 #'
 #' @return Returns plot of distribution of simulated statistics,
 #'    with values as or more extreme than specified
