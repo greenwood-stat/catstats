@@ -7,6 +7,7 @@
 two_mean_bootstrap_CI(
   formula,
   data,
+  summary_measure = "mean",
   first_in_subtraction,
   confidence_level = 0.95,
   number_repetitions = 100
@@ -19,6 +20,12 @@ where \code{predictor} defines the two groups of the explanatory variable and
 
 \item{data}{Data frame with columns for response and predictor variables.}
 
+\item{summary_measure}{Name of summary measure to return from simulations.
+Allowed values are
+\code{"mean"} for confidence interval for difference in means
+\code{"median"} for confidence interval for difference in medians.
+Defaults to \code{"mean"}.}
+
 \item{first_in_subtraction}{Value of predictor variable
 that should be first in order of subtraction for computing
 difference in means.}
@@ -29,10 +36,14 @@ Defaults to 0.95 (95\% confidence interval).}
 \item{number_repetitions}{Number of bootstrapped resamples.}
 }
 \value{
-Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
+Returns plot of distribution of bootstrapped statistics,
+with values as or more extreme than percentile confidence interval range
+highlighted, and reports confidence interval as subtitle on plot.
 }
 \description{
-Bootstrap confidence interval for a difference in means
+This function will create a bootstrap confidence interval for a
+difference in means or difference in medians of a quantitative variable
+for two independent groups.
 }
 \examples{
 data(pt)
@@ -40,5 +51,6 @@ two_mean_bootstrap_CI(responses ~ brand,
   data = pt,
   first_in_subtraction = "B1",
   confidence_level = 0.98,
-  number_repetitions = 1000)
+  number_repetitions = 1000
+)
 }

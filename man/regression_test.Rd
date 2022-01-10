@@ -37,15 +37,18 @@ Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 curve on the histogram. Defaults to FALSE.}
 }
 \description{
-Function to perform simulation-based test for slope of simple linear regression or correlation between two quantitative variables
+This function will run a simulation-based hypothesis test for a
+slope of simple linear regression or correlation
+between two quantitative variables.
 }
 \examples{
 data(mtfires)
-mtfires$logHect  <- log(mtfires$Hectares)
+mtfires$logHect <- log(mtfires$Hectares)
 regression_test(logHect ~ Temperature,
   data = mtfires,
   summary_measure = "correlation",
   as_extreme_as = 1.388,
   direction = "greater",
-  number_repetitions = 1000)
+  number_repetitions = 1000
+)
 }

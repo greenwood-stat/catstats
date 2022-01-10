@@ -22,14 +22,19 @@ Defaults to 0.95 (95\% confidence interval).}
 \item{number_repetitions}{Number of bootstrapped resamples.}
 }
 \value{
-Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
+Returns plot of distribution of bootstrapped statistics,
+with values as or more extreme than percentile confidence interval range
+highlighted, and reports confidence interval as subtitle on plot.
 }
 \description{
-Bootstrap confidence interval for one proportion
+This function will create a bootstrap confidence interval for a
+single proportion of successes.
 }
 \examples{
-one_proportion_bootstrap_CI(sample_size = 150,
-   number_successes = 98,
-   confidence_level = 0.99,
-   number_repetitions = 1000)
+one_proportion_bootstrap_CI(
+  sample_size = 150,
+  number_successes = 98,
+  confidence_level = 0.99,
+  number_repetitions = 1000
+)
 }

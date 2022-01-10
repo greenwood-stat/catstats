@@ -33,18 +33,22 @@ Defaults to 0.95 (95\% confidence interval).}
 \item{number_repetitions}{Number of bootstrapped resamples.}
 }
 \value{
-Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
+Returns plot of distribution of bootstrapped statistics,
+with values as or more extreme than percentile confidence interval range
+highlighted, and reports confidence interval as subtitle on plot.
 }
 \description{
-Bootstrap confidence interval for a difference in proportions
+This function will create a bootstrap confidence interval for a
+difference in proportion of successes between two independent groups.
 }
 \examples{
 data(pt)
-pt$twoSeconds <- ifelse(pt$responses >=2, "Yes", "No")
+pt$twoSeconds <- ifelse(pt$responses >= 2, "Yes", "No")
 two_proportion_bootstrap_CI(twoSeconds ~ brand,
   data = pt,
   first_in_subtraction = "B1",
   response_value_numerator = "Yes",
   confidence_level = 0.95,
-  number_repetitions = 1000)
+  number_repetitions = 1000
+)
 }

@@ -10,7 +10,8 @@ one_proportion_test(
   summary_measure = c("number", "proportion"),
   as_extreme_as,
   direction = c("greater", "less", "two-sided"),
-  number_repetitions = 1
+  number_repetitions = 1,
+  add_normal = FALSE
 )
 }
 \arguments{
@@ -34,21 +35,23 @@ Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 \item{number_repetitions}{Number of simulated samples.}
 }
 \value{
-Plot of distribution of simulated values,
+Returns plot of distribution of simulated statistics,
 with values as or more extreme than specified
-value highlighted and reports
-proportion of successes in simulations
+value highlighted, and reports
+proportion of simulations as or more extreme than specified
 as subtitle on plot.
 }
 \description{
-This function will run a simulation-based hypothesis test
-for the value of a single proportion.
+This function will run a simulation-based hypothesis test for a
+single proportion of successes.
 }
 \examples{
-one_proportion_test(probability_success = 0.5,
+one_proportion_test(
+  probability_success = 0.5,
   sample_size = 150,
   summary_measure = "proportion",
   as_extreme_as = 0.65,
   direction = "greater",
-  number_repetitions = 1000)
+  number_repetitions = 1000
+)
 }

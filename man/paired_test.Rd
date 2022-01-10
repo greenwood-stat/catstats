@@ -6,6 +6,7 @@
 \usage{
 paired_test(
   data,
+  summary_measure = "mean",
   which_first = 1,
   shift = 0,
   as_extreme_as,
@@ -17,6 +18,12 @@ paired_test(
 \arguments{
 \item{data}{Vector of differences or a
 two- or three-column data frame with values for each group in last two columns.}
+
+\item{summary_measure}{Name of summary measure to return from simulations.
+Allowed values are
+\code{"mean"} for test of paired mean difference or
+\code{"median"} for test of paired median difference.
+Defaults to \code{"mean"}.}
 
 \item{which_first}{Which column is first in order of subtraction?
 \code{1} if subtracting second column from first (1 - 2);
@@ -35,21 +42,28 @@ Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 curve on the histogram. Defaults to FALSE.}
 }
 \value{
-Produces plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
+Returns plot of distribution of simulated statistics,
+with values as or more extreme than specified
+value highlighted, and reports
+proportion of simulations as or more extreme than specified
+as subtitle on plot.
 }
 \description{
-Simulation-based hypothesis test for a paired mean difference
+This function will run a simulation-based hypothesis test for a
+paired mean difference or paired median difference between two
+quantitative variables for matched pairs data.
 }
 \examples{
 set.seed(117)
 x <- rnorm(25)
 y <- x + 1 + rnorm(25, 0, 1.8)
-data <- data.frame(x,y)
+data <- data.frame(x, y)
 obs_diff <- mean(x - y)
 paired_test(data,
   which_first = 1,
   shift = -obs_diff,
   as_extreme_as = obs_diff,
   direction = "two-sided",
-  number_repetitions = 1000)
+  number_repetitions = 1000
+)
 }

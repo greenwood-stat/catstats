@@ -40,19 +40,25 @@ Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 curve on the histogram. Defaults to FALSE.}
 }
 \value{
-Produces mosaic plot of observed proportions and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
+Returns plot of distribution of simulated statistics,
+with values as or more extreme than specified
+value highlighted, and reports
+proportion of simulations as or more extreme than specified
+as subtitle on plot.
 }
 \description{
-Simulation-based hypothesis test for a difference in proportions
+This function will run a simulation-based hypothesis test for a
+difference in proportion of successes between two independent groups.
 }
 \examples{
 data(pt)
-pt$twoSeconds <- ifelse(pt$responses >=2, "Yes", "No")
+pt$twoSeconds <- ifelse(pt$responses >= 2, "Yes", "No")
 two_proportion_test(twoSeconds ~ brand,
   data = pt,
   first_in_subtraction = "B1",
   response_value_numerator = "Yes",
   as_extreme_as = -.4,
   direction = "two-sided",
-  number_repetitions = 1000)
+  number_repetitions = 1000
+)
 }

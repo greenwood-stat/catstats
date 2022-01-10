@@ -6,6 +6,7 @@
 \usage{
 paired_bootstrap_CI(
   data,
+  summary_measure = "mean",
   which_first = 1,
   confidence_level = 0.95,
   number_repetitions = 100
@@ -14,6 +15,12 @@ paired_bootstrap_CI(
 \arguments{
 \item{data}{Vector of differences or a two- or three-column data frame
 with values for each group in last two columns.}
+
+\item{summary_measure}{Name of summary measure to return from simulations.
+Allowed values are
+\code{"mean"} for confidence interval for paired mean difference or
+\code{"median"} for confidence interval for paired median difference.
+Defaults to \code{"mean"}.}
 
 \item{which_first}{Which column is first in order of subtraction?
 \code{1} if subtracting second column from first (1 - 2);
@@ -25,18 +32,23 @@ Defaults to \code{0.95} (95\% confidence interval).}
 \item{number_repetitions}{Number of bootstrapped resamples.}
 }
 \value{
-Produces plot of distribution of bootstrapped values, with values as or more extreme than confidence interval range highlighted and reports CI as subtitle on plot
+Returns plot of distribution of bootstrapped statistics,
+with values as or more extreme than percentile confidence interval range
+highlighted, and reports confidence interval as subtitle on plot.
 }
 \description{
-Bootstrap confidence interval for a paired mean difference
+This function will create a bootstrap confidence interval for a
+paired mean difference or paired median difference between two
+quantitative variables for matched pairs data.
 }
 \examples{
 set.seed(117)
 x <- rnorm(25)
 y <- x + 1 + rnorm(25, 0, 1.8)
-data <- data.frame(x,y)
+data <- data.frame(x, y)
 paired_bootstrap_CI(data,
   which_first = 1,
   confidence_level = 0.9,
-  number_repetitions = 1000)
+  number_repetitions = 1000
+)
 }

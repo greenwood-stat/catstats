@@ -7,6 +7,7 @@
 two_mean_test(
   formula,
   data,
+  summary_measure = "mean",
   first_in_subtraction,
   as_extreme_as,
   direction = c("greater", "less", "two-sided"),
@@ -20,6 +21,12 @@ where \code{predictor} defines the two groups of the explanatory variable and
 \code{response} is a quantitative response variable.}
 
 \item{data}{Data frame with columns for response and predictor variables.}
+
+\item{summary_measure}{Name of summary measure to return from simulations.
+Allowed values are
+\code{"mean"} for test of difference in means or
+\code{"median"} for test of difference in medians.
+Defaults to \code{"mean"}.}
 
 \item{first_in_subtraction}{Value of predictor variable
 that should be first in order of subtraction for computing
@@ -36,10 +43,16 @@ Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 curve on the histogram. Defaults to FALSE.}
 }
 \value{
-Produces side-by-side boxplots of observed data and plot of distribution of simulated values, with values as or more extreme than specified value highlighted and count/proportion of those values reported as subtitle on plot
+Returns plot of distribution of simulated statistics,
+with values as or more extreme than specified
+value highlighted, and reports
+proportion of simulations as or more extreme than specified
+as subtitle on plot.
 }
 \description{
-Simulation-based hypothesis test for a difference in means
+This function will run a simulation-based hypothesis test for a
+difference in means or difference in medians of a quantitative variable
+for two independent groups.
 }
 \examples{
 data(pt)
@@ -48,5 +61,6 @@ two_mean_test(responses ~ brand,
   first_in_subtraction = "B1",
   as_extreme_as = -.4,
   direction = "two-sided",
-  number_repetitions = 1000)
+  number_repetitions = 1000
+)
 }

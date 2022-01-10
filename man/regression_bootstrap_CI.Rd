@@ -21,8 +21,8 @@ where \code{predictor} defines a quantitative explanatory variable and
 
 \item{summary_measure}{Name of summary measure to return from simulations.
 Allowed values are
-\code{"slope"} for test of slope or
-\code{"correlation"} for test of correlation.}
+\code{"slope"} for confidence interval for slope or
+\code{"correlation"} for confidence interval for correlation.}
 
 \item{confidence_level}{Confidence level for interval in decimal form.
 Defaults to 0.95 (95\% confidence interval).}
@@ -30,14 +30,17 @@ Defaults to 0.95 (95\% confidence interval).}
 \item{number_repetitions}{Number of bootstrapped resamples.}
 }
 \description{
-Function to create bootstrap confidence interval for slope of simple linear regression or correlation between two quantitative variables
+This function will create a bootstrap confidence interval for a
+slope of simple linear regression or correlation
+between two quantitative variables.
 }
 \examples{
 data(mtfires)
-mtfires$logHect  <- log(mtfires$Hectares)
+mtfires$logHect <- log(mtfires$Hectares)
 regression_bootstrap_CI(logHect ~ Temperature,
   data = mtfires,
   summary_measure = "correlation",
   confidence_level = 0.9,
-  number_repetitions = 1000)
+  number_repetitions = 1000
+)
 }

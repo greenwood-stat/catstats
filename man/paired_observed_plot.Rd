@@ -15,10 +15,13 @@ with values for each group in last two columns.}
 \code{2} if subtracting first column from second (2 - 1). Defaults to \code{1}.}
 }
 \value{
-Produces plot of distribution of observed values, with means & SDs in groups and paired observations linked by a line segment
+Returns plot of distribution of observed values,
+with means & standard deviations in groups and paired observations
+linked by a line segment, and histogram of differences.
 }
 \description{
-Plots for observed matched pairs data
+This function will create two plots of a quantitative variable
+and its differences for matched pairs data.
 }
 \examples{
 set.seed(117)
