@@ -504,8 +504,8 @@ one_proportion_bootstrap_CI <- function(sample_size,
 #' This function will create two plots of a quantitative variable
 #' and its differences for matched pairs data.
 #'
-#' @param data Two- or three-column data frame
-#'   with values for each group in last two columns.
+#' @param data Data frame
+#'   with values for each group in the first two columns.
 #' @param which_first Which column is first in order of subtraction?
 #'   `1` if subtracting second column from first (1 - 2);
 #'   `2` if subtracting first column from second (2 - 1). Defaults to `1`.
@@ -524,13 +524,11 @@ one_proportion_bootstrap_CI <- function(sample_size,
 
 paired_observed_plot <- function(data,
                                  which_first = 1) {
-  if (ncol(data) < 2 | ncol(data) > 3) {
-    stop("Data should have two or three columns.")
-  }
-  if (ncol(data) == 3) {
-    data <- data[, 2:3]
+  if (ncol(data) < 2) {
+    stop("Data should have at least two columns.")
   }
 
+  data <- as.data.frame(data[, 1:2])
   differences <- data[, 1] - data[, 2]
   if (which_first == 2) {
     differences <- data[, 2] - data[, 1]
