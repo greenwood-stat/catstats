@@ -1,6 +1,6 @@
 # README
 
-This is an R package used in Stat 216 and 217 at Montana State University.  Currently, it is only available on GitHub.  
+This is an R package used in Stat 216 and 337 at Montana State University.  Currently, it is only available on GitHub.  
 
 ## Installation
 
@@ -16,4 +16,4 @@ Then, use `install_github` to install this package.
 remotes::install_github("greenwood-stat/catstats")
 ```
 
-This package contains interactive vignettes, code, and data sets to support STAT 216 and STAT 217 at Montana State University and is publicly available for others to use.
+This package contains interactive vignettes, code, and data sets to support STAT 216 and STAT 337 at Montana State University and is publicly available for others to use.
