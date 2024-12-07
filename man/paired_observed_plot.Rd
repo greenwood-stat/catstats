@@ -7,8 +7,8 @@
 paired_observed_plot(data, which_first = 1)
 }
 \arguments{
-\item{data}{Two- or three-column data frame
-with values for each group in last two columns.}
+\item{data}{Data frame
+with values for each group in the first two columns.}
 
 \item{which_first}{Which column is first in order of subtraction?
 \code{1} if subtracting second column from first (1 - 2);

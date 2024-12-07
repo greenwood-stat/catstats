@@ -3,6 +3,8 @@
 export(add_norm)
 export(intplot)
 export(intplotarray)
+export(one_mean_CI)
+export(one_mean_test)
 export(one_proportion_bootstrap_CI)
 export(one_proportion_test)
 export(paired_bootstrap_CI)
