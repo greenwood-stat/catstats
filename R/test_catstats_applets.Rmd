@@ -52,7 +52,6 @@ one_mean_test(x,
   direction = "two-sided",
   number_repetitions = 100,
   add_normal = FALSE)
-
 ```
 
 

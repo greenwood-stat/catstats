@@ -520,18 +520,16 @@ one_proportion_bootstrap_CI <- function(sample_size,
 #'    proportion of simulations as or more extreme than specified
 #'    as subtitle on plot.
 #'
-#' @examples # NEED TO UPDATE
+#' @examples
 #' set.seed(117)
 #' x <- rnorm(25)
-#' y <- x + 1 + rnorm(25, 0, 1.8)
-#' data <- data.frame(x, y)
-#' obs_diff <- mean(x - y)
-#' paired_test(data,
-#'   which_first = 1,
-#'   shift = -obs_diff,
-#'   as_extreme_as = obs_diff,
-#'   direction = "two-sided",
-#'   number_repetitions = 1000
+#' m <- mean(x)
+#' one_mean_test(x,
+#'               summary_measure = "mean",
+#'               shift = -m,
+#'               as_extreme_as = m,
+#'               direction = "two-sided",
+#'               number_repetitions = 100
 #' )
 #' @export
 
@@ -666,15 +664,14 @@ one_mean_test <- function(data,
 #'   with values as or more extreme than percentile confidence interval range
 #'   highlighted, and reports confidence interval as subtitle on plot.
 #'
-#' @examples  # NEED TO UPDATE
+#' @examples
 #' set.seed(117)
 #' x <- rnorm(25)
-#' y <- x + 1 + rnorm(25, 0, 1.8)
-#' data <- data.frame(x, y)
-#' paired_bootstrap_CI(data,
-#'   which_first = 1,
-#'   confidence_level = 0.9,
-#'   number_repetitions = 1000
+#' m <- mean(x)
+#' one_mean_CI(x,
+#'             summary_measure = "mean",
+#'             number_repetitions = 100,
+#'             confidence_level = 0.95
 #' )
 #' @export
 
