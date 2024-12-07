@@ -155,9 +155,9 @@ one_proportion_test <- function(probability_success = 0.5,
           lwd = 5,
           col = ifelse(direction == "greater",
             ifelse(as.numeric(names(success_tab[i])) >=
-              as_extreme_as, "blue", "black"),
+              as_extreme_as, "red", "black"),
             ifelse(as.numeric(names(success_tab[i])) <=
-              as_extreme_as, "blue", "black")
+              as_extreme_as, "red", "black")
           )
         )
       }
@@ -165,7 +165,7 @@ one_proportion_test <- function(probability_success = 0.5,
         v = ifelse(direction == "greater",
           as_extreme_as - 0.5, as_extreme_as + 0.5
         ),
-        col = "blue", lwd = 2
+        col = "red", lwd = 2
       )
 
       cutoff_label <- ifelse(direction == "greater",
@@ -219,9 +219,9 @@ one_proportion_test <- function(probability_success = 0.5,
           lwd = 5,
           col = ifelse(direction == "greater",
             ifelse(as.numeric(names(success_tab[i])) / sample_size
-            >= as_extreme_as, "blue", "black"),
+            >= as_extreme_as, "red", "black"),
             ifelse(as.numeric(names(success_tab[i])) / sample_size
-            <= as_extreme_as, "blue", "black")
+            <= as_extreme_as, "red", "black")
           )
         )
       }
@@ -230,7 +230,7 @@ one_proportion_test <- function(probability_success = 0.5,
           as_extreme_as - 0.5 / sample_size,
           as_extreme_as + 0.5 / sample_size
         ),
-        col = "blue", lwd = 2
+        col = "red", lwd = 2
       )
 
       cutoff_label <- ifelse(direction == "greater",
@@ -287,13 +287,13 @@ one_proportion_test <- function(probability_success = 0.5,
         lwd = 5,
         col = ifelse(as.numeric(names(success_tab[i])) <= lower |
           as.numeric(names(success_tab[i])) >= upper,
-        "blue", "black"
+        "red", "black"
         )
       )
     }
     abline(
       v = c(lower + 0.5, upper - 0.5),
-      col = "blue", lwd = 2
+      col = "red", lwd = 2
     )
     cutoff_label <- c(paste("<=", lower), paste(">=", upper))
     text(c(lower - 0.25, upper + 0.25),
@@ -349,13 +349,13 @@ one_proportion_test <- function(probability_success = 0.5,
         lwd = 5,
         col = ifelse(as.numeric(names(success_tab[i])) / sample_size <= lower |
           as.numeric(names(success_tab[i])) / sample_size >= upper,
-        "blue", "black"
+        "red", "black"
         )
       )
     }
     abline(
       v = c(lower + 0.5 / sample_size, upper - 0.5 / sample_size),
-      col = "blue", lwd = 2
+      col = "red", lwd = 2
     )
 
     cutoff_label <- c(paste("<=", lower), paste(">=", upper))
@@ -478,8 +478,8 @@ one_proportion_bootstrap_CI <- function(sample_size,
   for (i in 1:length(success_tab)) {
     lines(rep(as.numeric(names(success_tab)[i]), 2), c(0, success_tab[i]),
       lwd = 5,
-      col = ifelse(as.numeric(names(success_tab[i])) <= low_ci |
-        as.numeric(names(success_tab[i])) >= high_ci, "blue", "black")
+      col = ifelse(as.numeric(names(success_tab[i])) >= low_ci &&
+        as.numeric(names(success_tab[i])) <= high_ci, "blue", "black")
     )
   }
   abline(
@@ -497,6 +497,258 @@ one_proportion_bootstrap_CI <- function(sample_size,
   )
 }
 
+#' Simulation-based hypothesis test for a single mean
+#'
+#' This function will run a simulation-based hypothesis test for a
+#' single mean or median of a quantitative variable.
+#'
+#' @param data Vector of quantitative data values.
+#' @param summary_measure Name of summary measure to return from simulations.
+#'    Allowed values are `"mean"` or `"median"`.
+#'    Defaults to `"mean"`.
+#' @param shift Amount to shift data values for bootstrapping of null distribution.
+#' @param number_repetitions Number of simulated samples.
+#' @param as_extreme_as Value of observed mean.
+#' @param direction Direction of alternative hypothesis.
+#'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
+#' @param add_normal Logical value indicating whether to superimpose a normal
+#'   curve on the histogram. Defaults to FALSE.
+#'
+#' @return Returns plot of distribution of simulated statistics,
+#'    with values as or more extreme than specified
+#'    value highlighted, and reports
+#'    proportion of simulations as or more extreme than specified
+#'    as subtitle on plot.
+#'
+#' @examples # NEED TO UPDATE
+#' set.seed(117)
+#' x <- rnorm(25)
+#' y <- x + 1 + rnorm(25, 0, 1.8)
+#' data <- data.frame(x, y)
+#' obs_diff <- mean(x - y)
+#' paired_test(data,
+#'   which_first = 1,
+#'   shift = -obs_diff,
+#'   as_extreme_as = obs_diff,
+#'   direction = "two-sided",
+#'   number_repetitions = 1000
+#' )
+#' @export
+
+one_mean_test <- function(data,
+                        summary_measure = "mean",
+                        shift = 0,
+                        as_extreme_as,
+                        direction = c("greater", "less", "two-sided"),
+                        number_repetitions = 1,
+                        add_normal = FALSE) {
+  if (!(summary_measure %in% c("mean", "median"))) {
+    stop("Summary measure must be either 'mean' or 'median'.")
+  }
+  if (!(direction %in% c("greater", "less", "two-sided"))) {
+    stop("Direction must be 'greater', 'less', or 'two-sided'.")
+  }
+  if (is.null(as_extreme_as)) {
+    stop("Must enter cutoff value for 'as_extreme_as'.")
+  }
+  if (number_repetitions < 1 | !(number_repetitions %% 1 == 0)) {
+    stop("Number of repetitions must be positive and integer valued.")
+  }
+
+  n <- length(data)
+
+  sim_means <- rep(NA, number_repetitions)
+
+  if (summary_measure == "mean") {
+    for (i in 1:number_repetitions) {
+      sim_means[i] <- mean(sample(x = data + shift, size = n, replace = TRUE))
+    }
+  } else {
+    for (i in 1:number_repetitions) {
+      sim_means[i] <- median(sample(x = data + shift, size = n, replace = TRUE))
+    }
+  }
+
+  count_extreme <- ifelse(direction == "greater", sum(sim_means >= as_extreme_as),
+                          ifelse(direction == "less", sum(sim_means <= as_extreme_as),
+                                 sum(sim_means <= -abs(as_extreme_as)) +
+                                   sum(sim_means >= abs(as_extreme_as))
+                          )
+  )
+
+  h <- hist(sim_means, plot = FALSE, breaks = "FD")
+  if (direction == "two-sided") {
+    cuts <- cut(h$breaks, c(-Inf, -abs(as_extreme_as), abs(as_extreme_as), Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[1]] <- "red"
+    col.vec[cuts == levels(cuts)[3]] <- "red"
+  } else if (direction == "greater") {
+    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[2]] <- "red"
+  } else {
+    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+    col.vec <- rep("grey80", length(cuts))
+    col.vec[cuts == levels(cuts)[1]] <- "red"
+  }
+
+  rnge <- max(sim_means) - min(sim_means)
+
+  ifelse(summary_measure == "mean",
+         xlabel <- "Mean",
+         xlabel <- "Median"
+  )
+  plot(h,
+       col = col.vec, main = "",
+       ylab = "",
+       yaxt = "n",
+       xlab = xlabel,
+       xlim = c(
+         min(
+           min(sim_means),
+           ifelse(direction == "two-sided",
+                  -abs(as_extreme_as) - rnge / 5,
+                  as_extreme_as - rnge / 5
+           )
+         ),
+         max(
+           max(sim_means),
+           ifelse(direction == "two-sided",
+                  abs(as_extreme_as) + rnge / 5,
+                  as_extreme_as + rnge / 5
+           )
+         )
+       ),
+       sub = paste("Count = ",
+                   count_extreme,
+                   "/", number_repetitions, " = ",
+                   round(count_extreme / number_repetitions, 4),
+                   sep = ""
+       )
+  )
+
+  if (add_normal == TRUE) {
+    add_norm(h, sim_means)
+  }
+
+  legend("topright",
+         legend =
+           c(
+             paste("Mean =", round(mean(sim_means, na.rm = T), 3)),
+             paste("SD =", round(sd(sim_means, na.rm = T), 3))
+           ),
+         col = "white", bty = "n"
+  )
+  if (direction == "two-sided") {
+    abline(v = abs(as_extreme_as), col = "red", lwd = 2)
+    abline(v = -abs(as_extreme_as), col = "red", lwd = 2)
+  } else {
+    abline(v = as_extreme_as, col = "red", lwd = 2)
+  }
+}
+
+
+
+#' Bootstrap confidence interval for a single mean
+#'
+#' This function will create a bootstrap confidence interval for a
+#' single mean or median of a quantitative variable.
+#'
+#' @param data Vector of quantitative data values.
+#' @param summary_measure Name of summary measure to return from simulations.
+#'    Allowed values are `"mean"` or `"median"`.
+#'    Defaults to `"mean"`.
+#' @param number_repetitions Number of bootstrapped resamples.
+#' @param confidence_level Confidence level for interval in decimal form.
+#'   Defaults to `0.95` (95% confidence interval).
+#'
+#' @return Returns plot of distribution of bootstrapped statistics,
+#'   with values as or more extreme than percentile confidence interval range
+#'   highlighted, and reports confidence interval as subtitle on plot.
+#'
+#' @examples  # NEED TO UPDATE
+#' set.seed(117)
+#' x <- rnorm(25)
+#' y <- x + 1 + rnorm(25, 0, 1.8)
+#' data <- data.frame(x, y)
+#' paired_bootstrap_CI(data,
+#'   which_first = 1,
+#'   confidence_level = 0.9,
+#'   number_repetitions = 1000
+#' )
+#' @export
+
+one_mean_CI <- function(data,
+                                summary_measure = "mean",
+                                confidence_level = 0.95,
+                                number_repetitions = 100) {
+  if (!(summary_measure %in% c("mean", "median"))) {
+    stop("Summary measure must be either 'mean' or 'median'.")
+  }
+  if (number_repetitions < 1 | !(number_repetitions %% 1 == 0)) {
+    stop("Number of repetitions must be positive and integer valued.")
+  }
+  if (confidence_level < 0 | confidence_level > 1) {
+    stop("Confidence level must be given in decimal form.")
+  }
+
+  n <- length(data)
+
+  sim_means <- rep(NA, number_repetitions)
+
+  if (summary_measure == "mean") {
+    for (i in 1:number_repetitions) {
+      boot_samp <- sample(data, n, replace = TRUE)
+      sim_means[i] <- mean(boot_samp)
+    }
+  } else {
+    obs_diff <- median(data)
+    for (i in 1:number_repetitions) {
+      boot_samp <- sample(data, n, replace = TRUE)
+      sim_means[i] <- median(boot_samp)
+    }
+  }
+
+  low_ci <- quantile(sim_means, (1 - confidence_level) / 2)
+  high_ci <- quantile(sim_means, 1 - (1 - confidence_level) / 2)
+
+  h <- hist(sim_means, plot = FALSE, breaks = "FD")
+
+  cuts <- cut(h$breaks, c(-Inf, low_ci, high_ci, Inf))
+  col.vec <- rep("grey80", length(cuts))
+  col.vec[cuts == levels(cuts)[2]] <- "blue"
+
+  break_range <- max(h$breaks) - min(h$breaks)
+  ifelse(summary_measure == "mean",
+         xlabel <- "Bootstrap Mean",
+         xlabel <- "Bootstrap Median"
+  )
+  plot(h,
+       col = col.vec, main = "",
+       ylab = "",
+       yaxt = "n",
+       xlim = c(
+         min(min(h$breaks), low_ci - break_range / 6),
+         max(max(h$breaks), high_ci + break_range / 6)
+       ),
+       xlab = xlabel,
+       sub = paste0(
+         100 * confidence_level, "% CI: (",
+         round(low_ci, 3), ", ", round(high_ci, 3), ")"
+       )
+  )
+  abline(v = c(low_ci, high_ci), col = "blue", lwd = 2)
+
+  cutoff_label <- c(
+    paste(round(100 * (1 - confidence_level) / 2, 1), "percentile"),
+    paste(round(100 * (1 - (1 - confidence_level) / 2), 1), "percentile")
+  )
+  text(c(low_ci, high_ci),
+       rep(max(h$counts), 2),
+       labels = cutoff_label,
+       pos = c(2, 4), cex = .75
+  )
+}
 
 
 #' Plots for observed matched pairs data
@@ -660,7 +912,6 @@ paired_test <- function(data,
     stop("'which_first' must equal 1 or 2 to indicate order of subtraction.")
   }
   if (is.vector(data)) {
-    warning("Assuming data entered is vector of differences.")
     differences <- data
     n <- length(data)
   } else {
@@ -821,7 +1072,6 @@ paired_bootstrap_CI <- function(data,
     stop("'which_first' must equal 1 or 2 to indicate order of subtraction.")
   }
   if (is.vector(data)) {
-    warning("Assuming data entered is vector of differences.")
     differences <- data
     n <- length(data)
   } else {
@@ -858,8 +1108,7 @@ paired_bootstrap_CI <- function(data,
 
   cuts <- cut(h$breaks, c(-Inf, low_ci, high_ci, Inf))
   col.vec <- rep("grey80", length(cuts))
-  col.vec[cuts == levels(cuts)[1]] <- "red"
-  col.vec[cuts == levels(cuts)[3]] <- "red"
+  col.vec[cuts == levels(cuts)[2]] <- "blue"
 
   break_range <- max(h$breaks) - min(h$breaks)
   ifelse(summary_measure == "mean",
@@ -880,7 +1129,7 @@ paired_bootstrap_CI <- function(data,
       round(low_ci, 3), ", ", round(high_ci, 3), ")"
     )
   )
-  abline(v = c(low_ci, high_ci), col = "red", lwd = 2)
+  abline(v = c(low_ci, high_ci), col = "blue", lwd = 2)
 
   cutoff_label <- c(
     paste(round(100 * (1 - confidence_level) / 2, 1), "percentile"),
@@ -1151,8 +1400,7 @@ two_proportion_bootstrap_CI <- function(formula,
 
   cuts <- cut(h$breaks, c(-Inf, low_ci, high_ci, Inf))
   col.vec <- rep("grey80", length(cuts))
-  col.vec[cuts == levels(cuts)[1]] <- "red"
-  col.vec[cuts == levels(cuts)[3]] <- "red"
+  col.vec[cuts == levels(cuts)[2]] <- "blue"
 
   break_range <- max(h$breaks) - min(h$breaks)
   plot(h,
@@ -1171,7 +1419,7 @@ two_proportion_bootstrap_CI <- function(formula,
       round(low_ci, 3), ", ", round(high_ci, 3), ")"
     )
   )
-  abline(v = c(low_ci, high_ci), col = "red", lwd = 2)
+  abline(v = c(low_ci, high_ci), col = "blue", lwd = 2)
 
   cutoff_label <- c(
     paste(round(100 * (1 - confidence_level) / 2, 1), "percentile"),
@@ -1576,8 +1824,7 @@ two_mean_bootstrap_CI <- function(formula,
 
   cuts <- cut(h$breaks, c(-Inf, low_ci, high_ci, Inf))
   col.vec <- rep("grey80", length(cuts))
-  col.vec[cuts == levels(cuts)[1]] <- "red"
-  col.vec[cuts == levels(cuts)[3]] <- "red"
+  col.vec[cuts == levels(cuts)[2]] <- "blue"
 
   break_range <- max(h$breaks) - min(h$breaks)
   ifelse(summary_measure == "mean",
@@ -1598,7 +1845,7 @@ two_mean_bootstrap_CI <- function(formula,
       round(low_ci, 3), ", ", round(high_ci, 3), ")"
     )
   )
-  abline(v = c(low_ci, high_ci), col = "red", lwd = 2)
+  abline(v = c(low_ci, high_ci), col = "blue", lwd = 2)
 
   cutoff_label <- c(
     paste(round(100 * (1 - confidence_level) / 2, 1), "percentile"),
@@ -1837,8 +2084,7 @@ regression_bootstrap_CI <- function(formula,
 
   cuts <- cut(h$breaks, c(-Inf, low_ci, high_ci, Inf))
   col.vec <- rep("grey80", length(cuts))
-  col.vec[cuts == levels(cuts)[1]] <- "red"
-  col.vec[cuts == levels(cuts)[3]] <- "red"
+  col.vec[cuts == levels(cuts)[2]] <- "blue"
 
   break_range <- max(h$breaks) - min(h$breaks)
   ifelse(summary_measure == "correlation",
@@ -1859,7 +2105,7 @@ regression_bootstrap_CI <- function(formula,
       round(low_ci, 3), ", ", round(high_ci, 3), ")"
     )
   )
-  abline(v = c(low_ci, high_ci), col = "red", lwd = 2)
+  abline(v = c(low_ci, high_ci), col = "blue", lwd = 2)
 
   cutoff_label <- c(
     paste(round(100 * (1 - confidence_level) / 2, 1), "percentile"),
