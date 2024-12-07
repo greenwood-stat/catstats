@@ -139,7 +139,7 @@ one_proportion_test <- function(probability_success = 0.5,
           )
         ),
         ylim = c(0, max(success_tab) + 3),
-        xlab = "Number of Successes",
+        xlab = "Simulated Number of Successes",
         ylab = "",
         yaxt = "n",
         sub = paste("Proportion of Samples = ",
@@ -203,7 +203,7 @@ one_proportion_test <- function(probability_success = 0.5,
           )
         ),
         ylim = c(0, max(success_tab) + 3),
-        xlab = "Proportion of Successes",
+        xlab = "Simulated Proportion of Successes",
         ylab = "",
         yaxt = "n",
         sub = paste("Proportion of Samples = ",
@@ -272,7 +272,7 @@ one_proportion_test <- function(probability_success = 0.5,
         max(max(number_heads), upper + range_heads / 5)
       ),
       ylim = c(0, max(success_tab) + 3),
-      xlab = "Number of Successes",
+      xlab = "Simulated Number of Successes",
       ylab = "",
       yaxt = "n",
       sub = paste("Proportion of Samples = ",
@@ -333,7 +333,7 @@ one_proportion_test <- function(probability_success = 0.5,
         )
       ),
       ylim = c(0, max(success_tab) + 3),
-      xlab = "Proportion of Successes",
+      xlab = "Simulated Proportion of Successes",
       ylab = "",
       yaxt = "n",
       sub = paste("Proportion of Samples = ",
@@ -593,8 +593,8 @@ one_mean_test <- function(data,
   rnge <- max(sim_means) - min(sim_means)
 
   ifelse(summary_measure == "mean",
-         xlabel <- "Mean",
-         xlabel <- "Median"
+         xlabel <- "Simulated Mean",
+         xlabel <- "Simulated Median"
   )
   plot(h,
        col = col.vec, main = "",
@@ -962,8 +962,8 @@ paired_test <- function(data,
   range_diffs <- max(sim_diffs) - min(sim_diffs)
 
   ifelse(summary_measure == "mean",
-    xlabel <- "Mean Difference",
-    xlabel <- "Median Difference"
+    xlabel <- "Simulated Mean Difference",
+    xlabel <- "Simulated Median Difference"
   )
   plot(h,
     col = col.vec, main = "",
@@ -1261,7 +1261,7 @@ two_proportion_test <- function(formula,
     col = col.vec, main = "",
     ylab = "",
     yaxt = "n",
-    xlab = "Difference in Proportions",
+    xlab = "Simulated Difference in Proportions",
     xlim = c(
       min(min(sim_diffs), ifelse(direction == "two-sided",
                                  -abs(as_extreme_as) - range_diffs / 5,
@@ -1587,8 +1587,8 @@ two_mean_test <- function(formula,
   }
   range_diffs <- max(sim_diffs) - min(sim_diffs)
   ifelse(summary_measure == "mean",
-    xlabel <- "Difference in Means",
-    xlabel <- "Difference in Medians"
+    xlabel <- "Simulated Difference in Means",
+    xlabel <- "Simulated Difference in Medians"
   )
   plot(h,
     col = col.vec, main = "",
@@ -1957,8 +1957,8 @@ regression_test <- function(formula,
   }
   range_diffs <- max(sim_vals) - min(sim_vals)
   ifelse(summary_measure == "correlation",
-    xlabel <- "Correlation",
-    xlabel <- "Slope"
+    xlabel <- "Simulated Correlation",
+    xlabel <- "Simulated Slope"
   )
   plot(h,
     col = col.vec, main = "",
