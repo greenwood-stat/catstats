@@ -639,8 +639,8 @@ one_mean_test <- function(data,
          col = "white", bty = "n"
   )
   if (direction == "two-sided") {
-    abline(v = abs(as_extreme_as), col = "red", lwd = 2)
-    abline(v = -abs(as_extreme_as), col = "red", lwd = 2)
+    abline(v = null_value+abs(as_extreme_as-null_value), col = "red", lwd = 2)
+    abline(v = null_value-abs(as_extreme_as-null_value), col = "red", lwd = 2)
   } else {
     abline(v = as_extreme_as, col = "red", lwd = 2)
   }
