@@ -6,6 +6,7 @@
 \usage{
 one_mean_test(
   data,
+  null_value = 0,
   summary_measure = "mean",
   shift = 0,
   as_extreme_as,

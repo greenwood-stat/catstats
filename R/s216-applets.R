@@ -534,6 +534,7 @@ one_proportion_bootstrap_CI <- function(sample_size,
 #' @export
 
 one_mean_test <- function(data,
+                        null_value = 0,
                         summary_measure = "mean",
                         shift = 0,
                         as_extreme_as,
@@ -569,14 +570,14 @@ one_mean_test <- function(data,
 
   count_extreme <- ifelse(direction == "greater", sum(sim_means >= as_extreme_as),
                           ifelse(direction == "less", sum(sim_means <= as_extreme_as),
-                                 sum(sim_means <= -abs(as_extreme_as)) +
-                                   sum(sim_means >= abs(as_extreme_as))
+                                 sum(sim_means <= null_value-abs(as_extreme_as-null_value)) +
+                                   sum(sim_means >= null_value+abs(as_extreme_as-null_value))
                           )
   )
 
   h <- hist(sim_means, plot = FALSE, breaks = "FD")
   if (direction == "two-sided") {
-    cuts <- cut(h$breaks, c(-Inf, -abs(as_extreme_as), abs(as_extreme_as), Inf))
+    cuts <- cut(h$breaks, c(-Inf, null_value-abs(as_extreme_as-null_value), null_value+abs(as_extreme_as-null_value), Inf))
     col.vec <- rep("grey80", length(cuts))
     col.vec[cuts == levels(cuts)[1]] <- "red"
     col.vec[cuts == levels(cuts)[3]] <- "red"
@@ -605,14 +606,14 @@ one_mean_test <- function(data,
          min(
            min(sim_means),
            ifelse(direction == "two-sided",
-                  -abs(as_extreme_as) - rnge / 5,
+                  null_value-abs(as_extreme_as-null_value) - rnge / 5,
                   as_extreme_as - rnge / 5
            )
          ),
          max(
            max(sim_means),
            ifelse(direction == "two-sided",
-                  abs(as_extreme_as) + rnge / 5,
+                  null_value+abs(as_extreme_as-null_value) + rnge / 5,
                   as_extreme_as + rnge / 5
            )
          )
