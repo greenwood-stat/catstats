@@ -51,6 +51,8 @@ add_norm <- function(h, data, freq = TRUE, na.rm = FALSE,
 #'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
 #' @param add_normal Logical value indicating whether to superimpose a normal
 #'   curve on the histogram. Defaults to FALSE.
+#' @param shade Logical value indicating whether to shade p-value area.
+#'   Defaults to TRUE.
 #'
 #' @return Returns plot of distribution of simulated statistics,
 #'    with values as or more extreme than specified
@@ -75,7 +77,8 @@ one_proportion_test <- function(probability_success = 0.5,
                                 as_extreme_as,
                                 direction = c("greater", "less", "two-sided"),
                                 number_repetitions = 1,
-                                add_normal = FALSE) {
+                                add_normal = FALSE,
+                                shade = TRUE) {
   if (number_repetitions < 1 | !(number_repetitions %% 1 == 0)) {
     stop("Number of repetitions must be positive and integer valued.")
   }
@@ -513,6 +516,8 @@ one_proportion_bootstrap_CI <- function(sample_size,
 #'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
 #' @param add_normal Logical value indicating whether to superimpose a normal
 #'   curve on the histogram. Defaults to FALSE.
+#' @param shade Logical value indicating whether to shade p-value area.
+#'   Defaults to TRUE.
 #'
 #' @return Returns plot of distribution of simulated statistics,
 #'    with values as or more extreme than specified
@@ -540,7 +545,8 @@ one_mean_test <- function(data,
                         as_extreme_as,
                         direction = c("greater", "less", "two-sided"),
                         number_repetitions = 1,
-                        add_normal = FALSE) {
+                        add_normal = FALSE,
+                        shade = TRUE) {
   if (!(summary_measure %in% c("mean", "median"))) {
     stop("Summary measure must be either 'mean' or 'median'.")
   }
@@ -864,6 +870,8 @@ paired_observed_plot <- function(data,
 #'   `2` if subtracting first column from second (2 - 1). Defaults to `1`.
 #' @param add_normal Logical value indicating whether to superimpose a normal
 #'   curve on the histogram. Defaults to FALSE.
+#' @param shade Logical value indicating whether to shade p-value area.
+#'   Defaults to TRUE.
 #'
 #' @return Returns plot of distribution of simulated statistics,
 #'    with values as or more extreme than specified
@@ -893,7 +901,8 @@ paired_test <- function(data,
                         as_extreme_as,
                         direction = c("greater", "less", "two-sided"),
                         number_repetitions = 1,
-                        add_normal = FALSE) {
+                        add_normal = FALSE,
+                        shade = TRUE) {
   if (!(summary_measure %in% c("mean", "median"))) {
     stop("Summary measure must be either 'mean' or 'median'.")
   }
@@ -1161,6 +1170,8 @@ paired_bootstrap_CI <- function(data,
 #'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
 #' @param add_normal Logical value indicating whether to superimpose a normal
 #'   curve on the histogram. Defaults to FALSE.
+#' @param shade Logical value indicating whether to shade p-value area.
+#'   Defaults to TRUE.
 #'
 #' @return Returns plot of distribution of simulated statistics,
 #'    with values as or more extreme than specified
@@ -1188,7 +1199,8 @@ two_proportion_test <- function(formula,
                                 as_extreme_as,
                                 direction = c("greater", "less", "two-sided"),
                                 number_repetitions = 1,
-                                add_normal = FALSE) {
+                                add_normal = FALSE,
+                                shade = TRUE) {
   if (!(direction %in% c("greater", "less", "two-sided"))) {
     stop("Direction must be one of 'greater',  'less', or 'two-sided'.")
   }
@@ -1243,19 +1255,23 @@ two_proportion_test <- function(formula,
   )
 
   h <- hist(sim_diffs, plot = FALSE, breaks = "FD")
-  if (direction == "two-sided") {
-    cuts <- cut(h$breaks, c(-Inf, -abs(as_extreme_as), abs(as_extreme_as), Inf))
-    col.vec <- rep("grey80", length(cuts))
-    col.vec[cuts == levels(cuts)[1]] <- "red"
-    col.vec[cuts == levels(cuts)[3]] <- "red"
-  } else if (direction == "greater") {
-    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
-    col.vec <- rep("grey80", length(cuts))
-    col.vec[cuts == levels(cuts)[2]] <- "red"
+  if (shade == TRUE) {
+      if (direction == "two-sided") {
+       cuts <- cut(h$breaks, c(-Inf, -abs(as_extreme_as), abs(as_extreme_as), Inf))
+       col.vec <- rep("grey80", length(cuts))
+       col.vec[cuts == levels(cuts)[1]] <- "red"
+       col.vec[cuts == levels(cuts)[3]] <- "red"
+     } else if (direction == "greater") {
+       cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+       col.vec <- rep("grey80", length(cuts))
+       col.vec[cuts == levels(cuts)[2]] <- "red"
+     } else {
+       cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+       col.vec <- rep("grey80", length(cuts))
+       col.vec[cuts == levels(cuts)[1]] <- "red"
+     }
   } else {
-    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
-    col.vec <- rep("grey80", length(cuts))
-    col.vec[cuts == levels(cuts)[1]] <- "red"
+    col.vec <- rep("grey80", length(h$breaks))
   }
   range_diffs <- max(sim_diffs) - min(sim_diffs)
   plot(h,
@@ -1290,11 +1306,13 @@ two_proportion_test <- function(formula,
     ),
     col = "white", bty = "n"
   )
-  if (direction == "two-sided") {
-    abline(v = abs(as_extreme_as), col = "red", lwd = 2)
-    abline(v = -abs(as_extreme_as), col = "red", lwd = 2)
-  } else {
-    abline(v = as_extreme_as, col = "red", lwd = 2)
+  if(shade == TRUE){
+    if (direction == "two-sided") {
+      abline(v = abs(as_extreme_as), col = "red", lwd = 2)
+      abline(v = -abs(as_extreme_as), col = "red", lwd = 2)
+    } else {
+      abline(v = as_extreme_as, col = "red", lwd = 2)
+    }
   }
 }
 
@@ -1455,6 +1473,8 @@ two_proportion_bootstrap_CI <- function(formula,
 #'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
 #' @param add_normal Logical value indicating whether to superimpose a normal
 #'   curve on the histogram. Defaults to FALSE.
+#' @param shade Logical value indicating whether to shade p-value area.
+#'   Defaults to TRUE.
 #'
 #' @return Returns plot of distribution of simulated statistics,
 #'    with values as or more extreme than specified
@@ -1480,7 +1500,8 @@ two_mean_test <- function(formula,
                           as_extreme_as,
                           direction = c("greater", "less", "two-sided"),
                           number_repetitions = 1,
-                          add_normal = FALSE) {
+                          add_normal = FALSE,
+                          shade = TRUE) {
   if (!(summary_measure %in% c("mean", "median"))) {
     stop("Summary measure must be either 'mean' or 'median'.")
   }
@@ -1572,19 +1593,23 @@ two_mean_test <- function(formula,
   )
 
   h <- hist(sim_diffs, plot = FALSE, breaks = "FD")
-  if (direction == "two-sided") {
-    cuts <- cut(h$breaks, c(-Inf, -abs(as_extreme_as), abs(as_extreme_as), Inf))
-    col.vec <- rep("grey80", length(cuts))
-    col.vec[cuts == levels(cuts)[1]] <- "red"
-    col.vec[cuts == levels(cuts)[3]] <- "red"
-  } else if (direction == "greater") {
-    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
-    col.vec <- rep("grey80", length(cuts))
-    col.vec[cuts == levels(cuts)[2]] <- "red"
+  if(shade == TRUE){
+    if (direction == "two-sided") {
+      cuts <- cut(h$breaks, c(-Inf, -abs(as_extreme_as), abs(as_extreme_as), Inf))
+      col.vec <- rep("grey80", length(cuts))
+      col.vec[cuts == levels(cuts)[1]] <- "red"
+      col.vec[cuts == levels(cuts)[3]] <- "red"
+    } else if (direction == "greater") {
+      cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+      col.vec <- rep("grey80", length(cuts))
+      col.vec[cuts == levels(cuts)[2]] <- "red"
+    } else {
+      cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
+      col.vec <- rep("grey80", length(cuts))
+      col.vec[cuts == levels(cuts)[1]] <- "red"
+    }
   } else {
-    cuts <- cut(h$breaks, c(-Inf, as_extreme_as, Inf))
-    col.vec <- rep("grey80", length(cuts))
-    col.vec[cuts == levels(cuts)[1]] <- "red"
+    col.vec <- rep("grey80", length(h$breaks))
   }
   range_diffs <- max(sim_diffs) - min(sim_diffs)
   ifelse(summary_measure == "mean",
@@ -1631,11 +1656,13 @@ two_mean_test <- function(formula,
     ),
     col = "white", bty = "n"
   )
-  if (direction == "two-sided") {
-    abline(v = abs(as_extreme_as), col = "red", lwd = 2)
-    abline(v = -abs(as_extreme_as), col = "red", lwd = 2)
-  } else {
-    abline(v = as_extreme_as, col = "red", lwd = 2)
+  if (shade == TRUE){
+    if (direction == "two-sided") {
+      abline(v = abs(as_extreme_as), col = "red", lwd = 2)
+      abline(v = -abs(as_extreme_as), col = "red", lwd = 2)
+    } else {
+      abline(v = as_extreme_as, col = "red", lwd = 2)
+    }
   }
 }
 
@@ -1876,6 +1903,8 @@ two_mean_bootstrap_CI <- function(formula,
 #' @param number_repetitions Number of simulated samples.
 #' @param add_normal Logical value indicating whether to superimpose a normal
 #'   curve on the histogram. Defaults to FALSE.
+#' @param shade Logical value indicating whether to shade p-value area.
+#'   Defaults to TRUE.
 #'
 #' @examples
 #' data(mtfires)
@@ -1895,7 +1924,8 @@ regression_test <- function(formula,
                             as_extreme_as,
                             direction = c("greater", "less", "two-sided"),
                             number_repetitions = 1,
-                            add_normal = FALSE) {
+                            add_normal = FALSE,
+                            shade = TRUE) {
   if (!(summary_measure %in% c("slope", "correlation"))) {
     stop("Summary measure must be either 'slope' or 'correlation'.")
   }
