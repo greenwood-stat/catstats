@@ -40,6 +40,7 @@
 #' @examples
 #' # must have the carData package installed
 #' data(TitanicSurvival, package = "carData")
+#' remotes::install_github("ndphillips/yarrr") #Required package for this function, requires remotes installed
 #' intplotarray(age ~ sex * survived, data = TitanicSurvival)
 
 #' @export

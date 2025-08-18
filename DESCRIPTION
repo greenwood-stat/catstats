@@ -36,8 +36,7 @@ Imports:
     rmarkdown,
     tidyverse,
     vcd,
-    viridis,
-    yarrr
+    viridis
 Suggests:
     alr4,
     coneproj,
