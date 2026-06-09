@@ -1,6 +1,6 @@
 Package: catstats
 Title: Statistics for Montana State University Bobcats
-Version: 0.1
+Version: 0.2
 Authors@R: 
     c(
     person(given = "Mark",
@@ -53,4 +53,4 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+Config/roxygen2/version: 8.0.0

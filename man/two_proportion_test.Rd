@@ -12,7 +12,8 @@ two_proportion_test(
   as_extreme_as,
   direction = c("greater", "less", "two-sided"),
   number_repetitions = 1,
-  add_normal = FALSE
+  add_normal = FALSE,
+  shade = TRUE
 )
 }
 \arguments{
@@ -38,6 +39,9 @@ Allowed values are \code{"greater"}, \code{"less"}, or \code{"two-sided"}.}
 
 \item{add_normal}{Logical value indicating whether to superimpose a normal
 curve on the histogram. Defaults to FALSE.}
+
+\item{shade}{Logical value indicating whether to shade p-value area.
+Defaults to TRUE.}
 }
 \value{
 Returns plot of distribution of simulated statistics,

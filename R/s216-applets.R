@@ -1448,6 +1448,520 @@ two_proportion_bootstrap_CI <- function(formula,
   )
 }
 
+#' Simulation-based hypothesis test for a relative risk
+#'
+#' This function will run a simulation-based hypothesis test for a
+#' relative risk between two independent groups. It notes any infinite RRs
+#' encountered and allows for an adjustment to avoid this issue.
+#' Infinite RRs are counted in the p-value calculation even though they are
+#' not displayed.
+#'
+#' Two-sided p-value is based on doubling the area for direction of
+#' observed RR versus 1.
+#'
+#' Some code for this function was modified using perplexity.ai.
+#'
+#' @param formula Formula of the form `response ~ predictor`,
+#'   where `predictor` defines the two groups of the explanatory variable and
+#'   `response` is binary or a two-level categorical variable.
+#' @param data Data frame with columns for response and predictor variables.
+#' @param group_numerator Value of predictor variable
+#'   that should be in the numerator of the relative risk
+#' @param response_value_numerator Value of response that corresponds
+#'   to "success" when computing proportions.
+#' @param number_repetitions Number of simulated samples.
+#' @param as_extreme_as Value of observed relative risk,
+#'    defaults to NULL and then is calculated using provided data.
+#' @param direction Direction of alternative hypothesis.
+#'    Allowed values are `"greater"`, `"less"`, or `"two-sided"`.
+#' @param bins breaks information for hist, defaults to "FD"
+#' @param bin_breaks vector of break points for bins, defaults to NULL
+#' @param shade Logical value indicating whether to shade p-value area.
+#'   Defaults to TRUE.
+#' @param adjust Adds 0.5 to all counts in the contingency table to avoid RR of infinity
+#'  (modifies both observed and permuted RRs), defaults to FALSE
+#' @param annotate add numerical information to plot, defaults to TRUE
+#' @param show_vlines add observed RR line and line for RR = 1 to plot in red, defaults to TRUE
+#' @param show_rug add alpha tick marks along x-axis for bootstrap RR values,
+#'    defaults to TRUE
+#' @param seed Set random number seed for stochastic components for reproducibility,
+#'    defaults to NULL and so does not set a seed.
+#'
+#' @return Returns plot of distribution of simulated statistics,
+#'    with values as or more extreme than specified
+#'    value highlighted, and reports
+#'    proportion of simulations as or more extreme than specified
+#'    as subtitle on plot.
+#'
+#' @examples
+#' library(dplyr)
+#' library(ggplot2)
+#' exp_gp  <- rep(c("vaccine", "placebo"), c(14, 6))
+#' outcome <- c(rep(c('infection', 'no infection'), c(5, 9)),
+#'              rep(c('infection', 'no infection'), c(6, 0)))
+#'  malaria <- data.frame(exp_gp = factor(exp_gp), outcome = factor(outcome))
+#'  relative_risk_test(outcome ~ exp_gp,
+#'       data = malaria,
+#'       group_numerator = "vaccine",
+#'       response_value_numerator = "infection",
+#'       annotate = T,
+#'       number_repetitions = 1000,
+#'       direction = "two-sided", adjust = F)
+#'  relative_risk_test(outcome ~ exp_gp,
+#'       data = malaria,
+#'       group_numerator = "vaccine",
+#'       response_value_numerator = "infection",
+#'       annotate = T,
+#'       number_repetitions = 1000,
+#'       direction = "less",
+#'       adjust = T)
+#'
+#' @export
+
+relative_risk_test <- function(formula,
+                                           data,
+                                           group_numerator,
+                                           response_value_numerator,
+                                           number_repetitions = 1000,
+                                           bins = "FD",
+                                           bin_breaks = NULL,
+                                           as_extreme_as = NULL,
+                                           shade = T,
+                                           direction = c("greater", "less", "two-sided"),
+                                           adjust = FALSE,
+                                           annotate = TRUE,
+                                           show_vlines = TRUE,
+                                           show_rug = TRUE,
+                                           seed = NULL) {
+  direction <- match.arg(direction)
+
+  if (number_repetitions < 1 || number_repetitions %% 1 != 0) {
+    stop("Number of repetitions must be positive and integer valued.")
+  }
+  if (!is.null(seed)) set.seed(seed)
+
+  resp.name <- all.vars(formula)[1]
+  pred.name <- all.vars(formula)[2]
+
+  data <- data.frame(data)
+  data[[resp.name]] <- factor(data[[resp.name]])
+  data[[pred.name]] <- factor(data[[pred.name]])
+
+  response <- data[[resp.name]]
+  predictor <- data[[pred.name]]
+
+  if (!(group_numerator %in% levels(predictor))) stop("Numerator group not in predictor levels.")
+  if (!(response_value_numerator %in% levels(response))) stop("Response value not in response levels.")
+
+  other_group <- setdiff(levels(predictor), group_numerator)
+  if (length(other_group) != 1) stop("This function currently assumes exactly two predictor groups.")
+
+  rr_from_tables <- function(pred, resp, adjust = FALSE) {
+    tab <- table(pred, resp)
+    tab <- tab[c(group_numerator, other_group),
+               c(response_value_numerator, setdiff(levels(resp), response_value_numerator))]
+    if (adjust) tab <- tab + 0.5
+    rp <- prop.table(tab, 1)
+    as.numeric(rp[1, 1] / rp[2, 1])
+  }
+
+  obs_rr <- if (is.null(as_extreme_as)) rr_from_tables(predictor, response, adjust = adjust) else as_extreme_as
+
+  perm_rr <- numeric(number_repetitions)
+  for (i in seq_len(number_repetitions)) {
+    perm_resp <- sample(response, replace = FALSE)
+    perm_rr[i] <- rr_from_tables(predictor, perm_resp, adjust = adjust)
+  }
+
+  n_inf <- sum(is.infinite(perm_rr))
+  prop_inf <- n_inf / length(perm_rr)
+  finite_perm <- perm_rr[is.finite(perm_rr)]
+
+  if (length(finite_perm) == 0) {
+    stop("All permutation replicates are infinite; cannot build histogram.")
+  }
+
+  p_greater <- (sum(perm_rr >= obs_rr, na.rm = TRUE) + 1) / (length(perm_rr) + 1)
+  p_less    <- (sum(perm_rr <= obs_rr, na.rm = TRUE) + 1) / (length(perm_rr) + 1)
+
+  p_value <- switch(
+    direction,
+    greater = p_greater,
+    less = p_less,
+    `two-sided` = {
+      p2 <- if (is.infinite(obs_rr)) {
+        if (obs_rr > 0) p_greater else p_less
+      } else if (obs_rr > 1) {
+        p_greater
+      } else if (obs_rr < 1) {
+        p_less
+      } else {
+        min(p_greater, p_less)
+      }
+      min(1, ((p2*(length(perm_rr) + 1) - 1)*2 + 1)/(length(perm_rr) + 1))
+    }
+  )
+
+  if (!is.null(bin_breaks)) {
+    breaks <- sort(unique(as.numeric(bin_breaks)))
+    h <- hist(finite_perm, breaks = breaks, plot = FALSE)
+  } else {
+    h <- hist(finite_perm, breaks = bins, plot = FALSE)
+    breaks <- h$breaks
+  }
+
+  bin_df <- data.frame(
+    left = breaks[-length(breaks)],
+    right = breaks[-1],
+    count = h$counts
+  )
+
+  hist_df <- bin_df
+  hist_df$ymin <- 0
+  hist_df$ymax <- hist_df$count
+
+  shade_list <- list()
+  for (i in seq_len(nrow(bin_df))) {
+    L <- bin_df$left[i]
+    R <- bin_df$right[i]
+    c0 <- bin_df$count[i]
+
+    if (direction == "greater") {
+      x1 <- max(L, obs_rr)
+      x2 <- R
+      if (x2 > x1) {
+        shade_list[[length(shade_list) + 1]] <- data.frame(xmin = x1, xmax = x2, ymin = 0, ymax = c0)
+      }
+    } else if (direction == "less") {
+      x1 <- L
+      x2 <- min(R, obs_rr)
+      if (x2 > x1) {
+        shade_list[[length(shade_list) + 1]] <- data.frame(xmin = x1, xmax = x2, ymin = 0, ymax = c0)
+      }
+    } else {
+      if (obs_rr >= 1){
+        x1 <- max(L, obs_rr)
+        x2 <- R
+        if (x2 > x1) {
+          shade_list[[length(shade_list) + 1]] <- data.frame(xmin = x1, xmax = x2, ymin = 0, ymax = c0)
+        }
+      }
+      if (obs_rr < 1){
+        x1 <- L
+        x2 <- min(R, obs_rr)
+        if (x2 > x1) {
+          shade_list[[length(shade_list) + 1]] <- data.frame(xmin = x1, xmax = x2, ymin = 0, ymax = c0)
+        }
+      }
+    }
+  }
+
+  shade_df <- if (length(shade_list)) do.call(rbind, shade_list) else data.frame(xmin = numeric(0), xmax = numeric(0), ymin = numeric(0), ymax = numeric(0))
+
+  subtitle_text <- paste0(
+    "Observed RR: ", round(obs_rr, 3),
+    " p-value: ", signif(p_value, 3),
+    if (!adjust) paste0("  ", round(100 * prop_inf, 1), "% +Inf") else "",
+    if (adjust) "  [0.5 adj]" else ""
+  )
+
+  y_max <- max(hist_df$ymax) * 1.05
+
+  p <- ggplot() +
+    geom_rect(
+      data = hist_df,
+      aes(xmin = left, xmax = right, ymin = ymin, ymax = ymax),
+      fill = "grey80",
+      color = "black",
+      alpha = 0.9
+    ) +
+    coord_cartesian(xlim = c(min(breaks), max(breaks)), ylim = c(0, y_max)) +
+    theme_minimal() +
+    theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+    labs(x = "Permutated Relative Risk", y = NULL)
+
+  if (shade){
+  p <- p +
+    geom_rect(
+      data = shade_df,
+      aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      fill = "red3",
+      alpha = 1,
+      color = NA
+    )
+  }
+  if (show_vlines) {
+    p <- p +
+      geom_vline(xintercept = obs_rr, color = "blue", lwd = 1) +
+      geom_vline(xintercept = 1, color = "black", linetype = 2, lwd = 0.8)
+    }
+
+  if (show_rug) {
+    p <- p +
+      geom_rug(
+        data = data.frame(x = finite_perm),
+        aes(x = x),
+        inherit.aes = FALSE,
+        sides = "b",
+        alpha = 0.35,
+        color = "black"
+      )
+  }
+
+  if (annotate) {
+    if (direction == "two-sided") {
+      p <- p + labs(subtitle = paste0(subtitle_text, "  (two-sided p-value, one side shaded)"))
+    } else {
+      p <- p + labs(subtitle = subtitle_text)
+    }
+
+    if (direction == "greater") {
+      p <- p +
+        annotate("text", x = obs_rr, y = y_max, label = "Observed RR", hjust = -0.1, size = 3) +
+        annotate("text", x = 1, y = y_max, label = "RR = 1", hjust = -0.1, size = 3)
+    } else if (direction == "less") {
+      p <- p +
+        annotate("text", x = obs_rr, y = y_max, label = "Observed RR", hjust = 1.1, size = 3) +
+        annotate("text", x = 1, y = y_max, label = "RR = 1", hjust = -0.1, size = 3)
+    } else {
+      p <- p +
+        annotate("text", x = obs_rr, y = y_max, label = "Observed RR", hjust = -0.1, size = 3) +
+        annotate("text", x = 1, y = y_max, label = "RR = 1", hjust = -0.1, size = 3) +
+        annotate("text", x = obs_rr, y = y_max * 0.92, label = "two-sided p-value", hjust = -0.1, size = 3)
+    }
+  }
+
+  p
+}
+
+
+
+#' Bootstrap confidence interval for a relative risk
+#'
+#' This function will create a bootstrap confidence interval for
+#' the ratio of two proportions of successes between two independent groups.
+#'
+#' Note that infinite RR values are not displayed but are included in the CI
+#' and noted in annotation. The adjust option avoids infinite RR values by
+#' adding 0.5 to all counts in the 2x2 contingency table.
+#'
+#' Some code for this function was modified using perplexity.ai.
+#'
+#' @param formula Formula of the form `response ~ predictor`,
+#'   where `predictor` defines the two groups of the explanatory variable and
+#'   `response` is binary or a two-level categorical variable.
+#' @param data Data frame with columns for response and predictor variables.
+#' @param group_numerator Value of predictor variable
+#'   that should be in the numerator of the relative risk
+#' @param response_value_numerator Value of response that corresponds
+#'   to "success" when computing proportions.
+#' @param number_repetitions Number of bootstrapped resamples.
+#' @param confidence_level Confidence level for interval in decimal form.
+#'   Defaults to 0.95 (95% confidence interval).
+#' @param bins breaks information for hist, defaults to "FD"
+#' @param bin_breaks vector of break points for bins, defaults to NULL
+#' @param adjust Adds 0.5 to all counts in the contingency table to avoid RR of infinity
+#'  (modifies both observed and bootstrap RRs), defaults to FALSE
+#' @param annotate add numerical information to plot, defaults to TRUE
+#' @param show_vlines add CI lines and line for RR = 1 to plot in red, defaults to TRUE
+#' @param show_rug add alpha tick marks along x-axis for bootstrap RR values,
+#'    defaults to TRUE
+#'
+#' @return Returns plot of distribution of bootstrapped statistics,
+#'   with values as or more extreme than percentile confidence interval range
+#'   highlighted, and reports confidence interval as subtitle on plot.
+#'
+#' @examples
+#' library(ggplot2)
+#' library(dplyr)
+#' exp_gp  <- rep(c("vaccine", "placebo"), c(14, 6))
+#' outcome <- c(rep(c('infection', 'no infection'), c(5, 9)),
+#'              rep(c('infection', 'no infection'), c(6, 0)))
+#' malaria <- data.frame(exp_gp, outcome)
+#' relative_risk_bootstrap_CI(outcome ~ exp_gp,
+#'                                  data = malaria,
+#'                                  group_numerator = "vaccine",
+#'                                  response_value_numerator = "infection",
+#'                                  number_repetitions = 100)
+#' relative_risk_bootstrap_CI(outcome ~ exp_gp,
+#'                                  data = malaria,
+#'                                  group_numerator = "placebo",
+#'                                  response_value_numerator = "infection",
+#'                                  number_repetitions = 500)
+#'
+
+#' @export
+
+relative_risk_bootstrap_CI  <- function(formula,
+                                        data,
+                                        group_numerator,
+                                        response_value_numerator,
+                                        confidence_level = 0.95,
+                                        number_repetitions = 100,
+                                        bins = "FD",
+                                        bin_breaks = NULL,
+                                        adjust = FALSE,
+                                        annotate = TRUE,
+                                        show_vlines = TRUE,
+                                        show_rug = TRUE) {
+  if (number_repetitions < 1 || number_repetitions %% 1 != 0) {
+    stop("Number of repetitions must be positive and integer valued.")
+  }
+
+  resp.name <- all.vars(formula)[1]
+  pred.name <- all.vars(formula)[2]
+
+  data <- data.frame(data)
+  data[[resp.name]] <- factor(data[[resp.name]])
+  data[[pred.name]] <- factor(data[[pred.name]])
+
+  response <- data[[resp.name]]
+  predictor <- data[[pred.name]]
+
+  if (!(group_numerator %in% levels(predictor))) stop("Numerator group not in predictor levels.")
+  if (!(response_value_numerator %in% levels(response))) stop("Response value not in response levels.")
+  if (confidence_level < 0 || confidence_level > 1) stop("Confidence level must be between 0 and 1.")
+
+  other_group <- setdiff(levels(predictor), group_numerator)
+  if (length(other_group) != 1) stop("This function currently assumes exactly two predictor groups.")
+
+  rr_calc <- function(pred, resp, adjust = FALSE) {
+    tab <- table(pred, resp)
+    tab <- tab[c(group_numerator, other_group), c(response_value_numerator, setdiff(levels(resp), response_value_numerator))]
+    if (adjust) tab <- tab + 0.5
+    rp <- prop.table(tab, 1)
+    as.numeric(rp[1, 1] / rp[2, 1])
+  }
+
+  obs.rr <- rr_calc(predictor, response, adjust = adjust)
+
+  ng1 <- sum(predictor == group_numerator)
+  ng2 <- sum(predictor != group_numerator)
+  sim_rr <- numeric(number_repetitions)
+
+  for (i in seq_len(number_repetitions)) {
+    newResponse <- response
+    newResponse[predictor == group_numerator] <-
+      sample(response[predictor == group_numerator], ng1, replace = TRUE)
+    newResponse[predictor != group_numerator] <-
+      sample(response[predictor != group_numerator], ng2, replace = TRUE)
+
+    sim_rr[i] <- rr_calc(predictor, newResponse, adjust = adjust)
+  }
+
+  n_inf <- sum(is.infinite(sim_rr))
+  prop_inf <- n_inf / length(sim_rr)
+
+  low_ci <- as.numeric(quantile(sim_rr, (1 - confidence_level) / 2, na.rm = TRUE, names = FALSE))
+  high_ci <- as.numeric(quantile(sim_rr, 1 - (1 - confidence_level) / 2, na.rm = TRUE, names = FALSE))
+
+  finite_sim <- sim_rr[is.finite(sim_rr)]
+  if (length(finite_sim) == 0) stop("All bootstrap replicates are infinite; cannot build histogram of finite values.")
+
+  if (!is.null(bin_breaks)) {
+    breaks <- sort(unique(as.numeric(bin_breaks)))
+    h <- hist(finite_sim, breaks = breaks, plot = FALSE)
+  } else {
+    h <- hist(finite_sim, breaks = bins, plot = FALSE)
+    breaks <- h$breaks
+  }
+
+  bin_df <- data.frame(
+    left = breaks[-length(breaks)],
+    right = breaks[-1],
+    count = h$counts
+  )
+
+  hist_df <- bin_df
+  hist_df$ymin <- 0
+  hist_df$ymax <- hist_df$count
+
+  shade_list <- list()
+  for (i in seq_len(nrow(bin_df))) {
+    L <- bin_df$left[i]
+    R <- bin_df$right[i]
+    c0 <- bin_df$count[i]
+
+    x1 <- max(L, low_ci)
+    x2 <- min(R, high_ci)
+
+    if (x2 > x1) {
+      shade_list[[length(shade_list) + 1]] <- data.frame(
+        xmin = x1,
+        xmax = x2,
+        ymin = 0,
+        ymax = c0
+      )
+    }
+  }
+  shade_df <- if (length(shade_list)) do.call(rbind, shade_list) else data.frame()
+
+  subtitle_text <- paste0(
+    "RR: ", round(obs.rr, 3),
+    "  ", 100 * confidence_level, "% CI: (",
+    round(low_ci, 3), ", ", round(high_ci, 3), ")",
+    if (n_inf > 0) paste0("  ", round(100 * prop_inf, 1), "% +Inf"),
+    if (adjust) "  [0.5 adjusted]"
+  )
+
+  y_max <- max(hist_df$ymax) * 1.05
+
+  p <- ggplot() +
+    geom_rect(
+      data = hist_df,
+      aes(xmin = left, xmax = right, ymin = ymin, ymax = ymax),
+      fill = "grey80",
+      color = "black",
+      alpha = 0.9
+    ) +
+    geom_rect(
+      data = shade_df,
+      aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      fill = "steelblue",
+      alpha = 0.35,
+      color = NA
+    ) +
+    #    coord_cartesian(xlim = c(min(breaks), max(breaks)), ylim = c(0, y_max)) +
+    theme_minimal() +
+    theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+    labs(x = "Bootstrap Relative Risk", y = NULL)
+
+  if (show_vlines) {
+    p <- p + geom_vline(xintercept = 1, color = "darkgrey", lty = 2, lwd = 1) +
+      geom_vline(xintercept = c(low_ci, high_ci), color = "blue", lwd = 1) +
+      geom_vline(xintercept = obs.rr, color = "red", lwd = 1)
+  }
+
+  if (show_rug) {
+    p <- p +
+      geom_rug(
+        data = data.frame(x = finite_sim),
+        aes(x = x),
+        inherit.aes = FALSE,
+        sides = "b",
+        alpha = 0.35,
+        color = "black"
+      )
+  }
+
+  if (annotate) {
+    p <- p + labs(subtitle = subtitle_text)
+    cutoff_label <- c(
+      paste0(round(100 * (1 - confidence_level) / 2, 1), " percentile"),
+      paste0(round(100 * (1 - (1 - confidence_level) / 2), 1), " percentile")
+    )
+    p <- p +
+      annotate("text", x = low_ci, y = y_max, label = cutoff_label[1], hjust = 1.1, size = 3,
+               color = "blue") +
+      annotate("text", x = high_ci, y = y_max, label = cutoff_label[2], hjust = -0.1, size = 3,
+               color = "blue") +
+      annotate("text", x = obs.rr, y = y_max, label = round(obs.rr,3), size = 3, color = "red")
+  }
+
+  p
+}
+
+
 
 #' Simulation-based hypothesis test for a difference in means
 #'
