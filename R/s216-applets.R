@@ -1675,10 +1675,10 @@ relative_risk_test <- function(formula,
       color = "black",
       alpha = 0.9
     ) +
-    coord_cartesian(xlim = c(min(breaks), max(breaks)), ylim = c(0, y_max)) +
+    coord_cartesian(xlim = c(-1/log(dim(data)[1]), max(max(breaks), obs_rr) + 1/log(dim(data)[1])), ylim = c(0, y_max)) +
     theme_minimal() +
     theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
-    labs(x = "Permutated Relative Risk", y = NULL)
+    labs(x = "Permuted Relative Risk", y = NULL)
 
   if (shade){
   p <- p +
@@ -1686,7 +1686,7 @@ relative_risk_test <- function(formula,
       data = shade_df,
       aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
       fill = "red3",
-      alpha = 1,
+      alpha = 0.95,
       color = NA
     )
   }
@@ -1721,7 +1721,7 @@ relative_risk_test <- function(formula,
         annotate("text", x = 1, y = y_max, label = "RR = 1", hjust = -0.1, size = 3)
     } else if (direction == "less") {
       p <- p +
-        annotate("text", x = obs_rr, y = y_max, label = "Observed RR", hjust = 1.1, size = 3) +
+        annotate("text", x = obs_rr, y = y_max, label = "Observed RR", hjust = -0.1, size = 3) +
         annotate("text", x = 1, y = y_max, label = "RR = 1", hjust = -0.1, size = 3)
     } else {
       p <- p +
@@ -1921,7 +1921,7 @@ relative_risk_bootstrap_CI  <- function(formula,
       alpha = 0.35,
       color = NA
     ) +
-    #    coord_cartesian(xlim = c(min(breaks), max(breaks)), ylim = c(0, y_max)) +
+    coord_cartesian(xlim = c(-0.3, max(breaks)), ylim = c(0, y_max)) +
     theme_minimal() +
     theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
     labs(x = "Bootstrap Relative Risk", y = NULL)
@@ -1929,7 +1929,7 @@ relative_risk_bootstrap_CI  <- function(formula,
   if (show_vlines) {
     p <- p + geom_vline(xintercept = 1, color = "darkgrey", lty = 2, lwd = 1) +
       geom_vline(xintercept = c(low_ci, high_ci), color = "blue", lwd = 1) +
-      geom_vline(xintercept = obs.rr, color = "red", lwd = 1)
+      geom_vline(xintercept = obs.rr, color = "red3", lwd = 1, alpha = 0.2)
   }
 
   if (show_rug) {
@@ -1955,7 +1955,7 @@ relative_risk_bootstrap_CI  <- function(formula,
                color = "blue") +
       annotate("text", x = high_ci, y = y_max, label = cutoff_label[2], hjust = -0.1, size = 3,
                color = "blue") +
-      annotate("text", x = obs.rr, y = y_max, label = round(obs.rr,3), size = 3, color = "red")
+      annotate("text", x = obs.rr, y = y_max, label = round(obs.rr,3), size = 3, color = "red3")
   }
 
   p

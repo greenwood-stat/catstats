@@ -17,7 +17,7 @@ Authors@R:
     )
 Description: Contains a suite of things that are used in instruction at Montana State University. Intended to make working in RStudio easier for the students at MSU. Also supports the textbooks "Intermediate Statistics with R" written by Mark Greenwood and "Montana State Introductory Statistics with R" written by Nicole Carnegie, Stacey Hancock, Elijah Meyer, Jade Schmidt, and Melinda Yager. This package contains functions for enhanced interaction plots and simulation-based inference. It also will install most packages needed for the materials in the courses.
 Depends:
-    R (>= 3.6.2)
+    R (>= 4.6.0)
 Imports:
     car,
     carData,
